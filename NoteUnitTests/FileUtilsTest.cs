@@ -2,7 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Note.FileUtils;
 
 //USE THIS NAMESPACE FOR TESTING METHODS
-namespace UtilitiesUnitTest
+namespace NoteUnitTests
 {
     [TestClass]
     public class FileUtilsTest

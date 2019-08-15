@@ -4,6 +4,7 @@ using System.Text;
 using Note.Attributes;
 using System.Diagnostics.Contracts;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Note
 {
@@ -308,42 +309,125 @@ namespace Note
                     sb.Append(src.ElementAt(i));
                 }
                 else switch (frl)
-                {
-                    case 0:
-                    case 2:
-                    case 3:
-                    defBehavior:
-                        if (evenlySpacedSeparator && isLooselyPrimitive)
-                        {
-                            if (frl != 2)
+                    {
+                        case 0:
+                        case 2:
+                        case 3:
+                        defBehavior:
+                            if (evenlySpacedSeparator && isLooselyPrimitive)
                             {
-                                sb.Append(src.ElementAt(i) + " " + separator + " ");
+                                if (frl != 2)
+                                {
+                                    sb.Append(src.ElementAt(i) + " " + separator + " ");
+                                }
+                                else
+                                {
+                                    sb.Append(src.ElementAt(i) + separator + " ");
+                                }
                             }
-                            else
+                            else if (isLooselyPrimitive)
                             {
                                 sb.Append(src.ElementAt(i) + separator + " ");
                             }
-                        }
-                        else if (isLooselyPrimitive)
-                        {
-                            sb.Append(src.ElementAt(i) + separator + " ");
-                        }
-                        else
-                        {
-                            sb.Append(src.ElementAt(i) + separator);
-                        }
-                        break;
+                            else
+                            {
+                                sb.Append(src.ElementAt(i) + separator);
+                            }
+                            break;
 
-                    case 1:
-                        if (hasNoSep)
-                            sb.Append(src.ElementAt(i));
-                        else
-                            goto defBehavior;
-                        break;
-                }
+                        case 1:
+                            if (hasNoSep)
+                                sb.Append(src.ElementAt(i));
+                            else
+                                goto defBehavior;
+                            break;
+                    }
             }
             sb.Append(outerRight);
             return sb.ToString();
         }
+
+        [StrongBeta]
+        public static void Copy<T>(IEnumerable<T> sourceEnumerable,
+                                   int sourceIndex,
+                                   IEnumerable<T> destEnumerable,
+                                   int destIndex,
+                                   int length) {
+            HyperIterator.HyperIteratorUnm(sourceEnumerable, sourceIndex, destEnumerable, destIndex, length);
+        }
+
+        [StrongBeta]
+        public static void Copy<T>(IEnumerable<T> sourceEnumerable, IEnumerable<T> destEnumerable, int length)
+        {
+            Copy(sourceEnumerable, 0, destEnumerable, 0, length);
+        }
+
+        [StrongBeta]
+        public static void Copy<T>(IEnumerable<T> sourceEnumerable, IEnumerable<T> destEnumerable)
+        {
+            int len = destEnumerable.Count();
+            Copy(sourceEnumerable, 0, destEnumerable, 0, len);
+        }
+        
+        internal static bool LibCopy(int[] x, int[] y)
+        {
+            Array.Copy(x, y, x.Length);
+            return true;
+        }
+
+        [StrongBeta]
+        [System.Runtime.ConstrainedExecution.ReliabilityContract(System.Runtime.ConstrainedExecution.Consistency.MayCorruptInstance, System.Runtime.ConstrainedExecution.Cer.MayFail)]
+        internal static class HyperIterator
+        {
+            private const int THREAD_CAP = 50;
+            private const int THREAD_MIN = 1;
+            internal static void HyperIteratorUnm<T>(IEnumerable<T> src, int srcIdx, IEnumerable<T> dst, int destIdx, int len)
+            {
+                short numThreads = (short)(Math.Log(len) / 2);
+
+                if (numThreads == THREAD_MIN - 1 || numThreads == THREAD_MIN || numThreads == THREAD_MIN + 1)
+                {
+                    Array.Copy((T[])src, srcIdx, (T[]) dst, destIdx, len);
+                    return;
+                }
+                if (numThreads > THREAD_CAP)
+                {
+                    numThreads = THREAD_CAP;
+                }
+
+                double threadApproxPartition = (double)len / numThreads;
+                int threadDefPartition = (int)Math.Floor(threadApproxPartition);
+                bool obtusePartition = len % 2 == 0 && (len / threadDefPartition) % 2 != 0;
+
+                Thread[] t_harness = new Thread[numThreads];
+                int offset = 0;
+                for (int i = 0; i < numThreads; i++)
+                {
+                    if (i == numThreads - 1 && obtusePartition)
+                    {
+                        threadDefPartition = len - offset;
+                    }
+
+                    T[] isolatedPartitionSrc = new T[threadDefPartition];
+                    Array.Copy((T[])src, srcIdx + offset, isolatedPartitionSrc, 0, threadDefPartition);
+
+                    int offCap = offset;
+                    int tdpCap = threadDefPartition;
+                    t_harness[i] = new Thread(() =>
+                        Array.Copy(isolatedPartitionSrc, 0, (T[])dst, destIdx + offCap, tdpCap))
+                    {
+                        IsBackground = true
+                    };
+                    t_harness[i].Start();
+
+                    offset += threadDefPartition;
+                }
+
+                for (int i = 0; i < numThreads; i++)
+                {
+                    t_harness[i].Join();
+                }
+            }
+        }//HyperIterator
     }//EnumerableUtils
 }//Namespace

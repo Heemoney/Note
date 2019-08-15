@@ -348,7 +348,6 @@ namespace Note
 
         /// <summary>
         /// Checks if each character in a string is lexicographically smaller than the previous character.
-        /// 
         /// </summary>
         /// <param name="str">The string to be used</param>
         /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
@@ -417,7 +416,7 @@ namespace Note
         }
 
         /// <summary>
-        /// Checks if a given string is a palindrome while ignoring casing
+        /// Checks if a given string is a palindrome while ignoring casing.
         /// </summary>
         /// <param name="str">The string to be used</param>
         /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
@@ -442,5 +441,135 @@ namespace Note
             }
             return true;
         }
-    }
-}
+
+        /// <summary>
+        /// Checks if a string is well formed. A string is well formed if
+        /// for every alphabet-recognized character, there is an approriate
+        /// closing character. For every inner string, with the exception
+        /// of characters not defined in the alphabet, in between an opening
+        /// and closing character, if that string were to be split in half,
+        /// each half would be a mirror image of each other. A well formed 
+        /// string consists of the default alphabet constists of the following 
+        /// characters: '(',')','{','}','[',']','<','>'.
+        /// <code>
+        ///
+        /// using static Utilities.StringUtils;
+        /// 
+        /// class TestClass
+        /// {
+        ///     static void Main(string[] args)
+        ///     {
+        ///         Console.WriteLine("<<()>>{}{}".IsWellFormed()); //prints true
+        ///         Console.WriteLine("{([)]}".IsWellFormed()) //prints false
+        ///     }
+        /// }
+        /// </code>
+        /// </summary>
+        /// <param name="str">the string to check</param>
+        /// <returns>whether the string is well formed</returns>
+        public static bool IsWellFormed(this string str)
+        {
+            return IsWellFormed(str, WellFormedUtility.DefaultAlphabet);
+        }
+
+        /// <summary>
+        /// Checks if a string is well formed. A string is well formed if
+        /// for every alphabet-recognized character, there is an approriate
+        /// closing character. For every inner string, with the exception
+        /// of characters not defined in the alphabet, in between an opening
+        /// and closing character, if that string were to be split in half,
+        /// each half would be a mirror image of each other. A well formed 
+        /// string consists of the user specified Dictionary of key-value
+        /// pairs, where the key is the opening character and the value
+        /// is the closing character.
+        /// <code>
+        ///
+        /// using static Utilities.StringUtils;
+        /// using System.Collections.Generic;
+        ///
+        /// class TestClass
+        /// {
+        ///     static void Main(string[] args)
+        ///     {
+        ///         var dict = new Dictionary<char, char>();
+        ///         {
+        ///             {'/','\'},
+        ///             {'(',')'}
+        ///         };
+        ///         Console.WriteLine("(/Manu\)".IsWellFormed(dict)); //prints true
+        ///     }
+        /// }
+        /// </code>
+        /// </summary>
+        /// <param name="str">the string to check</param>
+        /// <param name="alphabet">the dictionary of key value pairs - where the key
+        /// represents the opening character and the value represents the closing character</param>
+        /// <returns>whether the string is well formed</returns>
+        public static bool IsWellFormed(this string str, Dictionary<char, char> alphabet)
+        {
+            return new WellFormedUtility(alphabet).Run(str);
+        }
+
+        /// <summary>
+        /// A utility class that contains functions to determine
+        /// whether a string is a well formed string.
+        /// </summary>
+        [Author("Manu Puduvalli")]
+        protected internal class WellFormedUtility
+        {
+            /// <summary>
+            /// The default alphabet
+            /// </summary>
+            public static Dictionary<char, char> DefaultAlphabet { get; } 
+                = new Dictionary<char, char>(4)
+            {
+                { '(', ')' },
+                { '{', '}' },
+                { '[', ']' },
+                { '<', '>' },
+            };
+
+            /// <summary>
+            /// An instance of the Dictionary containing this alphabet.
+            /// </summary>
+            private readonly Dictionary<char, char> Alphabet;
+
+            /// <summary>
+            /// Contructor that sets up the alphabet
+            /// </summary>
+            /// <param name="dct"></param>
+            public WellFormedUtility(Dictionary<char,char> dct)
+            {
+                Alphabet = dct;
+            }
+
+            /// <summary>
+            /// Verifies the "well formedness" of the string by using
+            /// a stack data structure to measure the balance of the string.
+            /// </summary>
+            /// <param name="inp">The input string</param>
+            /// <returns></returns>
+            public bool Run(string inp)
+            {
+                var stk = new Stack<char>(10);
+                try
+                {
+                    foreach (var c in inp)
+                    {
+                        if (!Alphabet.ContainsKey(c) && !Alphabet.ContainsValue(c)) continue;
+                        if (Alphabet.ContainsKey(c)) stk.Push(c);
+                        else
+                            if (Alphabet[stk.Pop()] != c)
+                                return false;
+                    }
+                }
+                catch (Exception ex) when (ex is InvalidOperationException || 
+                                           ex is NullReferenceException)
+                {
+                    return false;
+                }
+                return true;
+            }
+        } //WellFormedUtility
+    } //StringUtils 
+} //Note
