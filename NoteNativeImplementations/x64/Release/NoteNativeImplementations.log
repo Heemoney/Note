@@ -1,7 +1,0 @@
-﻿  EnumerableImpl.cpp
-     Creating library C:\Users\Manu\source\repos\Note\x64\Release\NoteNativeImplementations.lib and object C:\Users\Manu\source\repos\Note\x64\Release\NoteNativeImplementations.exp
-  Generating code
-  Previous IPDB not found, fall back to full compilation.
-  All 68 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
-  Finished generating code
-  NoteNativeImplementations.vcxproj -> C:\Users\Manu\source\repos\Note\x64\Release\NoteNativeImplementations.dll
