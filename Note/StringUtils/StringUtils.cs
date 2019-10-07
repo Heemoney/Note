@@ -11,12 +11,6 @@ namespace Note
     [Author("Manu Puduvalli")]
     public static class StringUtils
     {
-        /*
-         * A string for a space character.
-         *
-         */
-        private const string SPACE = " ";
-
         /// <summary>
         /// Reverses a string from left to right order while maintaining case sensitivity.
         /// </summary>
@@ -31,7 +25,7 @@ namespace Note
             {
                 return string.Empty;
             }
-            char[] c = str.ToCharArray();
+            var c = str.ToCharArray();
             Array.Reverse(c);
             return new string(c);
         }
@@ -50,7 +44,7 @@ namespace Note
             {
                 return string.Empty;
             }
-            int idx = str.IndexOf(SPACE);
+            int idx = str.IndexOf(string.Empty);
             if(idx >= 0)
             {
                 return str.Substring(0, idx);
@@ -78,13 +72,12 @@ namespace Note
             }
             if (spaces != 0)
             {
-                int index_of_space = 0;
-                int matching_num_spaces = 0;
+                var matching_num_spaces = 0;
                 for (int i = 0; i < str.Length; i++)
                 {
                     if (char.IsWhiteSpace(str[i]))
                     {
-                        index_of_space = i;
+                        int index_of_space = i;
                         matching_num_spaces++;
 
                         if (spaces == matching_num_spaces)
@@ -121,7 +114,7 @@ namespace Note
         /// <param name="args">The characters which will be removed</param>
         /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
         /// <returns>The string with all characters in args removed</returns>
-        public static string RemoveAll(this string str, params char[] args)
+        public static string RemoveAll(this string str, params IEnumerable<char>[] args)
         {
             if(str == null) throw new ArgumentNullException(nameof(str));
             if (args == null) throw new ArgumentNullException(nameof(args));
@@ -134,8 +127,8 @@ namespace Note
             {
                 return string.Empty;
             }
-            StringBuilder sb = new StringBuilder(str);
-            for(int i = 0; i < args.Length; i++)
+            var sb = new StringBuilder(str);
+            for (int i = 0; i < args.Length; i++)
             {
                 sb.Replace(args[i].ToString(), string.Empty);
             }
@@ -149,7 +142,7 @@ namespace Note
         /// <param name="args">The characters which will be removed</param>
         /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
         /// <returns>The string with all characters in args removed</returns>
-        public static string RemoveAllInnerStrings(this string str, params string[] args)
+        public static string RemoveAll(this string str, params IEnumerable<string>[] args)
         {
             if(str == null) throw new ArgumentNullException(nameof(str));
             if (args == null) throw new ArgumentNullException(nameof(args));
@@ -162,18 +155,20 @@ namespace Note
             {
                 return string.Empty;
             }
-            StringBuilder sb = new StringBuilder(str);
-            
-            for (int i = 0; i < args.Length; i++)
+            var sb = new StringBuilder(str);
+
+            for (int i = 0; i < str.Length; i++)
             {
-                if(args[i].Length == 1)
+                int cnt = args[i].Count();
+                var i_str = args[i].ToString();
+                if(cnt == 1)
                 {
-                    sb.Replace(args[i].ToString(), string.Empty);
+                    sb.Replace(i_str, string.Empty);
                 }
                 else
                 {
-                    int idxOfWord = sb.ToString().IndexOf(args[i]);
-                    sb.Remove(idxOfWord, args[i].Length);
+                    int idxOfWord = sb.ToString().IndexOf(i_str);
+                    sb.Remove(idxOfWord, cnt);
                 }
             }
             return sb.ToString();
@@ -186,7 +181,7 @@ namespace Note
         /// <param name="args">The characters which will be removed</param>
         /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
         /// <returns>The string with all characters in args removed</returns>
-        public static string RemoveAllIgnoreCase(this string str, params char[] args)
+        public static string RemoveAllIgnoreCase(this string str, params IEnumerable<char>[] args)
         {
             if(str == null) throw new ArgumentNullException(nameof(str));
             if (args == null) throw new ArgumentNullException(nameof(args));
@@ -199,11 +194,11 @@ namespace Note
             {
                 return string.Empty;
             }
-            str += str.ToLower();
-            StringBuilder sb = new StringBuilder(str);
+            str = str.ToLower();
+            var sb = new StringBuilder(str);
             for (int i = 0; i < args.Length; i++)
             {
-                sb.Replace(args[i].ToString(), string.Empty);
+                sb.Replace(args[i].ToString().ToLower(), string.Empty);
             }
             return sb.ToString();
         }
@@ -215,7 +210,7 @@ namespace Note
         /// <param name="args">The characters which will be removed</param>
         /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
         /// <returns>The string with all characters in args removed</returns>
-        public static string RemoveAllInnerStringsIgnoreCase(this string str, params string[] args)
+        public static string RemoveAllIgnoreCase(this string str, params IEnumerable<string>[] args)
         {
             if(str == null) throw new ArgumentNullException(nameof(str));
             if (args == null) throw new ArgumentNullException(nameof(args));
@@ -228,18 +223,20 @@ namespace Note
             {
                 return string.Empty;
             }
-            str += str.ToLower();
-            StringBuilder sb = new StringBuilder(str);
+            str = str.ToLower();
+            var sb = new StringBuilder(str);
             for (int i = 0; i < args.Length; i++)
             {
-                if (args[i].Length == 1)
+                var cnt = args[i].Count();
+                var i_str = args[i].ToString().ToLower();
+                if (cnt == 1)
                 {
-                    sb.Replace(args[i].ToString(), string.Empty);
+                    sb.Replace(i_str, string.Empty);
                 }
                 else
                 {
-                    int idxOfWord = sb.ToString().IndexOf(args[i]);
-                    sb.Remove(idxOfWord, args[i].Length);
+                    int idxOfWord = sb.ToString().IndexOf(i_str);
+                    sb.Remove(idxOfWord, cnt);
                 }
             }
             return sb.ToString();
@@ -276,8 +273,8 @@ namespace Note
             {
                 return new List<char>(0);
             }
-            List<char> strcpy_list = new List<char>(str.Length);
-            for(int i = 0; i < str.Length; i++) //For loop is faster than foreach in almost all scenarios
+            var strcpy_list = new List<char>(str.Length);
+            for (int i = 0; i < str.Length; i++)
             {
                 strcpy_list.Add(str[i]);
             }
@@ -317,7 +314,7 @@ namespace Note
             {
                 return false;
             }
-            for (int i = 0; i < str.Length - 1; i++)
+            for (var i = 0; i < str.Length - 1; i++)
             {
                 if (str[i] > str[i + 1]) return false;
             }
@@ -339,7 +336,7 @@ namespace Note
             {
                 return false;
             }
-            for (int i = 0; i < str.Length - 1; i++)
+            for (var i = 0; i < str.Length - 1; i++)
             {
                 if (str[i] > str[i + 1]) return false;
             }
@@ -404,7 +401,7 @@ namespace Note
                 return true; //empty string is a palindrome!
             }
             //All palindromes that exist are less than Int32.MaxValue
-            for (int advancing = 0; advancing < str.Length; advancing++)
+            for (var advancing = 0; advancing < str.Length; advancing++)
             {
                 int retrograding = str.Length - 1 - advancing;
                 if (str[advancing] != str[retrograding])
@@ -431,7 +428,7 @@ namespace Note
             }
             //All palindromes that exist are less than Int32.MaxValue
             str = str.ToLower();
-            for (int advancing = 0; advancing < str.Length; advancing++)
+            for (var advancing = 0; advancing < str.Length; advancing++)
             {
                 int retrograding = str.Length - 1 - advancing;
                 if (str[advancing] != str[retrograding])
@@ -469,6 +466,8 @@ namespace Note
         /// <returns>whether the string is well formed</returns>
         public static bool IsWellFormed(this string str)
         {
+            if (str == null) throw new ArgumentNullException(nameof(str));
+            Contract.EndContractBlock();
             return IsWellFormed(str, WellFormedUtility.DefaultAlphabet);
         }
 
@@ -507,6 +506,14 @@ namespace Note
         /// <returns>whether the string is well formed</returns>
         public static bool IsWellFormed(this string str, Dictionary<char, char> alphabet)
         {
+            if (str == null) throw new ArgumentNullException(nameof(str));
+            Contract.EndContractBlock();
+
+            if (alphabet == null)
+            {
+                return IsWellFormed(str);
+            }
+
             return new WellFormedUtility(alphabet).Run(str);
         }
 
@@ -540,7 +547,8 @@ namespace Note
             /// <param name="dct"></param>
             public WellFormedUtility(Dictionary<char,char> dct)
             {
-                Alphabet = dct;
+                //Because the Utility is a protected internal class
+                Alphabet = dct ?? throw new ArgumentNullException(nameof(dct));
             }
 
             /// <summary>
@@ -563,13 +571,49 @@ namespace Note
                                 return false;
                     }
                 }
-                catch (Exception ex) when (ex is InvalidOperationException || 
+                catch (Exception ex) when (ex is InvalidOperationException ||
                                            ex is NullReferenceException)
                 {
                     return false;
                 }
                 return true;
             }
-        } //WellFormedUtility
+        } //WellFormedUtilities
+
+        /// <summary>
+        /// Checks whether a string contains duplicate characters.
+        /// </summary>
+        /// <param name="str">The string to be used</param>
+        /// <returns>True if their are duplicate characters. False, otherwise</returns>
+        public static bool ContainsDuplicateChars(this string str)
+        {
+            if (str == null) throw new ArgumentNullException(nameof(str));
+            Contract.EndContractBlock();
+            var set = new HashSet<char>();
+            for (int i = 0; i < str.Length; i++)
+                //User overloaded operator for Add
+                if (!set.Add(str[i]))
+                    return false;
+            return true;
+        }
+
+        /// <summary>
+        /// Checks whether a string contains duplicate inner strings.
+        /// </summary>
+        /// <param name="str">The string to be used</param>
+        /// <param name="arg">The inner string to search for duplicates</param>
+        /// <returns>True if their are duplicate inner strings. False, otherwise</returns>
+        public static bool ContainsDuplicateStrings(this string str, string arg)
+        {
+            if (str == null) throw new ArgumentNullException(nameof(str));
+            Contract.EndContractBlock();
+
+            if (arg == null) return false;
+            var regex = new System.Text.RegularExpressions.Regex(
+                pattern: System.Text.RegularExpressions.Regex.Escape(arg));
+            var rem = regex.Replace(str, string.Empty, 1);
+            var secondRem = rem.Replace(arg, string.Empty);
+            return !(rem == secondRem);
+        }
     } //StringUtils 
 } //Note

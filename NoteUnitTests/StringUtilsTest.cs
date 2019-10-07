@@ -12,7 +12,7 @@ namespace NoteUnitTests
         [TestMethod]
         public void IsWellFormedTest()
         {
-            Dictionary<char, char> dt = new Dictionary<char, char>
+            var dt = new Dictionary<char, char>
             {
                 ['<'] = '>',
                 ['('] = ')'
@@ -20,6 +20,12 @@ namespace NoteUnitTests
 
             Assert.AreEqual(true, StringUtils.IsWellFormed("<<((Manu))>>", dt));
             Assert.AreEqual(false, StringUtils.IsWellFormed("<<((Manu)>>", dt));
+        }
+
+        [TestMethod]
+        public void ContainsDuplicateInnerStringTest()
+        {
+           
         }
     }
 }

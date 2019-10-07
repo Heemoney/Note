@@ -69,7 +69,7 @@ namespace Note
             }
 
             var sorted = from num in src orderby num select num;
-            int itemIndex = (int)sorted.Count() / 2;
+            var itemIndex = sorted.Count() / 2;
 
             if (sorted.Count() % 2 == 0)
                 return (sorted.ElementAt(itemIndex) + sorted.ElementAt(itemIndex - 1)) / 2;
@@ -113,7 +113,7 @@ namespace Note
 
             var sorted = from num in src orderby num select num;
 
-            Dictionary<double, int> hash = new Dictionary<double, int>();
+            var hash = new Dictionary<double, int>();
             foreach (var t in sorted)
             {
                 if (hash.ContainsKey(t)) hash[t] += 1;
@@ -171,10 +171,10 @@ namespace Note
             Contract.EndContractBlock();
 
             double mean = Mean(src);
-            double sum = 0;
-            for (int i = 0; i < len; i++)
+            var sum = 0.0;
+            for (var i = 0; i < len; i++)
             {
-                sum += Math.Pow((src.ElementAt(i) - mean), 2);
+                sum += Math.Pow(src.ElementAt(i) - mean, 2);
             }
             sum /= (len - 1); //n-1 denoted as bessel's correction for sample standard dev
 
@@ -210,8 +210,8 @@ namespace Note
             Contract.EndContractBlock();
 
             double mean = Mean(src);
-            double sum = 0;
-            for (int i = 0; i < len; i++)
+            var sum = 0.0;
+            for (var i = 0; i < len; i++)
             {
                 sum += Math.Pow((src.ElementAt(i) - mean), 2);
             }
@@ -247,7 +247,7 @@ namespace Note
             if (src.Count() == 0) throw new InvalidOperationException(nameof(src));
             Contract.EndContractBlock();
 
-            var variance = SampleVariance(src);
+            double variance = SampleVariance(src);
             return Math.Round(variance, 2);
         }
 
@@ -277,7 +277,7 @@ namespace Note
             if (src.Count() == 0) throw new InvalidOperationException(nameof(src));
             Contract.EndContractBlock();
 
-            var variance = PopulationVariance(src);
+            double variance = PopulationVariance(src);
             return Math.Round(variance, 2);
         }
 
@@ -425,8 +425,8 @@ namespace Note
             if (src.Count() == 0) throw new InvalidOperationException(nameof(src));
             Contract.EndContractBlock();
 
-            var lowerQuart = LowerQuartile(src);
-            var upperQuart = UpperQuartile(src);
+            double lowerQuart = LowerQuartile(src);
+            double upperQuart = UpperQuartile(src);
             return upperQuart - lowerQuart;
         }
 
@@ -560,8 +560,10 @@ namespace Note
         /// <param name="stdDev">The standard deviation of the data set</param>
         /// <param name="size">The size of the data set</param>
         /// <returns>Constructs the t-critical value</returns>
-        public static double ConstructTValue(double mean, double popMean, double stdDev, double size) =>
-        ((mean - popMean) / (stdDev / Math.Sqrt(size)));
+        public static double ConstructTValue(double mean, double popMean, double stdDev, double size)
+        {
+            return (mean - popMean) / (stdDev / Math.Sqrt(size));
+        }
 
     }//EnumerableStats
 }//namespace Utilities

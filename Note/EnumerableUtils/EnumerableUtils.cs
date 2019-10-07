@@ -4,7 +4,6 @@ using System.Text;
 using Note.Attributes;
 using System.Diagnostics.Contracts;
 using System.Collections.Generic;
-using System.Threading;
 
 namespace Note
 {
@@ -347,87 +346,60 @@ namespace Note
             return sb.ToString();
         }
 
-        [StrongBeta]
-        public static void Copy<T>(IEnumerable<T> sourceEnumerable,
-                                   int sourceIndex,
-                                   IEnumerable<T> destEnumerable,
-                                   int destIndex,
-                                   int length) {
-            HyperIterator.HyperIteratorUnm(sourceEnumerable, sourceIndex, destEnumerable, destIndex, length);
+        /// <summary>
+        /// Enables python style for-loop for easier readability. This loop begins
+        /// at the starting value and loops until the end - 1,
+        /// </summary>
+        /// <param name="start">The starting counter for the loop (inclusive)</param>
+        /// <param name="end">The ending counter for the loop (exclusive)</param>
+        /// <returns>An IEnumerable<int> representing the current index</returns>
+        /// <example>This example shows how to use the <see cref="Range(int, int)"/>method.</example>
+        /// <code>
+        /// using static Utilities.EnumerableUtils;
+        /// 
+        /// class TestClass
+        /// {
+        ///     static void Main(string[] args)
+        ///     {
+        ///         foreach(int i in Range(0,10)) Console.WriteLine(i); //Prints 0 - 9
+        ///     }
+        /// }
+        /// </code>
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining |
+            System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
+        public static IEnumerable<int> Range(int start, int end)
+        {
+            for (int i = start; i <= end; i++) 
+                yield return i; 
+            yield break;
         }
 
-        [StrongBeta]
-        public static void Copy<T>(IEnumerable<T> sourceEnumerable, IEnumerable<T> destEnumerable, int length)
+        /// <summary>
+        /// Enables python style for-loop for easier readability. This loop begins
+        /// at the starting value and loops until the end.
+        /// </summary>
+        /// <param name="start">The starting counter for the loop (inclusive)</param>
+        /// <param name="end">The ending counter for the loop (inclusive)</param>
+        /// <returns>An IEnumerable<int> representing the current index</returns>
+        /// <example>This example shows how to use the <see cref="Span(int, int)"/>method.</example>
+        /// <code>
+        /// using static Utilities.EnumerableUtils;
+        /// 
+        /// class TestClass
+        /// {
+        ///     static void Main(string[] args)
+        ///     {
+        ///         foreach(int i in Span(0,10)) Console.WriteLine(i); //Prints 0 - 10
+        ///     }
+        /// }
+        /// </code>
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining |
+            System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
+        public static IEnumerable<int> Span(int start, int end)
         {
-            Copy(sourceEnumerable, 0, destEnumerable, 0, length);
+            for (int i = start; i <= end; i++) 
+                yield return i; 
+            yield break;
         }
-
-        [StrongBeta]
-        public static void Copy<T>(IEnumerable<T> sourceEnumerable, IEnumerable<T> destEnumerable)
-        {
-            int len = destEnumerable.Count();
-            Copy(sourceEnumerable, 0, destEnumerable, 0, len);
-        }
-        
-        internal static bool LibCopy(int[] x, int[] y)
-        {
-            Array.Copy(x, y, x.Length);
-            return true;
-        }
-
-        [StrongBeta]
-        [System.Runtime.ConstrainedExecution.ReliabilityContract(System.Runtime.ConstrainedExecution.Consistency.MayCorruptInstance, System.Runtime.ConstrainedExecution.Cer.MayFail)]
-        internal static class HyperIterator
-        {
-            private const int THREAD_CAP = 50;
-            private const int THREAD_MIN = 1;
-            internal static void HyperIteratorUnm<T>(IEnumerable<T> src, int srcIdx, IEnumerable<T> dst, int destIdx, int len)
-            {
-                short numThreads = (short)(Math.Log(len) / 2);
-
-                if (numThreads == THREAD_MIN - 1 || numThreads == THREAD_MIN || numThreads == THREAD_MIN + 1)
-                {
-                    Array.Copy((T[])src, srcIdx, (T[]) dst, destIdx, len);
-                    return;
-                }
-                if (numThreads > THREAD_CAP)
-                {
-                    numThreads = THREAD_CAP;
-                }
-
-                double threadApproxPartition = (double)len / numThreads;
-                int threadDefPartition = (int)Math.Floor(threadApproxPartition);
-                bool obtusePartition = len % 2 == 0 && (len / threadDefPartition) % 2 != 0;
-
-                Thread[] t_harness = new Thread[numThreads];
-                int offset = 0;
-                for (int i = 0; i < numThreads; i++)
-                {
-                    if (i == numThreads - 1 && obtusePartition)
-                    {
-                        threadDefPartition = len - offset;
-                    }
-
-                    T[] isolatedPartitionSrc = new T[threadDefPartition];
-                    Array.Copy((T[])src, srcIdx + offset, isolatedPartitionSrc, 0, threadDefPartition);
-
-                    int offCap = offset;
-                    int tdpCap = threadDefPartition;
-                    t_harness[i] = new Thread(() =>
-                        Array.Copy(isolatedPartitionSrc, 0, (T[])dst, destIdx + offCap, tdpCap))
-                    {
-                        IsBackground = true
-                    };
-                    t_harness[i].Start();
-
-                    offset += threadDefPartition;
-                }
-
-                for (int i = 0; i < numThreads; i++)
-                {
-                    t_harness[i].Join();
-                }
-            }
-        }//HyperIterator
     }//EnumerableUtils
 }//Namespace
