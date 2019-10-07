@@ -14,7 +14,7 @@ namespace Note
         /*
          * The tolerance level (upper and lower limits)
          */
-        protected const double TOLERANCE = 0.00000000000000000000000;
+        internal const double TOLERANCE = 0.00000000000000000000000;
 
         /// <summary>
         /// Finds the average of all the elements in the enumerable.
