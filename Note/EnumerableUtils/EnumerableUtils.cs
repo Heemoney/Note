@@ -369,7 +369,7 @@ namespace Note
             System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
         public static IEnumerable<int> Range(int start, int end)
         {
-            for (int i = start; i <= end; i++) 
+            for (int i = start; i < end; i++) 
                 yield return i; 
             yield break;
         }
