@@ -365,8 +365,6 @@ namespace Note
         ///     }
         /// }
         /// </code>
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining |
-            System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
         public static IEnumerable<int> Range(int start, int end)
         {
             for (int i = start; i < end; i++) 
@@ -393,8 +391,6 @@ namespace Note
         ///     }
         /// }
         /// </code>
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining |
-            System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
         public static IEnumerable<int> Span(int start, int end)
         {
             for (int i = start; i <= end; i++) 
