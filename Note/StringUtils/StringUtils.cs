@@ -11,6 +11,9 @@ namespace Note
     [Author("Manu Puduvalli")]
     public static class StringUtils
     {
+
+        public const char SPACE = (char)32;
+
         /// <summary>
         /// Reverses a string from left to right order while maintaining case sensitivity.
         /// </summary>
@@ -641,26 +644,21 @@ namespace Note
 
             if (preserveSpaces)
             {
-                var joiner = new StringBuilder();
-                string[] spaceSplit = str.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (string word in spaceSplit)
+                if (str.Contains(SPACE))
                 {
-                    if (ZeroOrOne(word))
+                    string[] spaceSplit = str.Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
+
+                    for(int i = 0; i < spaceSplit.Length; i++)
                     {
-                        joiner.Append(word);
+                        if (!ZeroOrOne(spaceSplit[i]))
+                        {
+                            spaceSplit[i] = new ShuffleUtility(spaceSplit[i]).ShuffleThis();
+                        }
                     }
-                    else
-                    {
-                        joiner.Append(new ShuffleUtility(word).ShuffleThis());
-                    }
-                    joiner.Append(" ");
+                    return string.Join(" ", spaceSplit);
                 }
-                return joiner.ToString();
             }
-            else
-            {
-                return new ShuffleUtility(str).ShuffleThis();
-            }
+            return new ShuffleUtility(str).ShuffleThis();
         }
 
         /// <summary>
