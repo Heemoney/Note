@@ -1,17 +1,16 @@
-﻿using System;
-using static Note.StringUtils;
-using static Note.EnumerableUtils;
-using static Note.FileUtils;
-using static Note.MathUtils;
-
-namespace Executable
+﻿namespace Executable
 {
-    ///For active debugging when testing :)
-    class Program
+
+#if DEBUG
+    /// <summary>
+    /// For active debugging class libraries
+    /// </summary>
+    class DebuggingExecutable
     {
         static void Main()
         {
 
         }
     }
+#endif
 }
