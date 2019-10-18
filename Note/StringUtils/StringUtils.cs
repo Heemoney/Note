@@ -21,9 +21,7 @@ namespace Note
         /// <returns>The converted string</returns>
         public static string CharToString(IEnumerable<char> charEnumerable)
         {
-            if (charEnumerable is null)
-                throw new ArgumentNullException(nameof(charEnumerable));
-            
+            if(charEnumerable is null) throw new ArgumentNullException(nameof(charEnumerable));
             return new string(charEnumerable as char[] ?? charEnumerable.ToArray());
         }
 
@@ -35,7 +33,7 @@ namespace Note
         /// <returns>The string retaining the first word</returns>
         public static string Chomp(this string str)
         {
-            if (str is null) throw new ArgumentNullException(nameof(str));
+            str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
             if (str.Length == 0)
@@ -63,7 +61,7 @@ namespace Note
         /// <returns>The string retaining the chomped word</returns>
         public static string ChompAfter(this string str, int spaces)
         {
-            if (str is null) throw new ArgumentNullException(nameof(str));
+            str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
             if (str.Length == 0)
             {
@@ -97,7 +95,7 @@ namespace Note
         /// <returns>True if the string contains any digits, false otherwise</returns>
         public static bool ContainsDigits(this string str)
         {
-            if (str is null) throw new ArgumentNullException(nameof(str));
+            str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
             if (str.Length == 0)
             {
@@ -114,7 +112,7 @@ namespace Note
         /// <returns>True if their are duplicate characters. False, otherwise</returns>
         public static bool ContainsDuplicateChars(this string str)
         {
-            if (str is null) throw new ArgumentNullException(nameof(str));
+            str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
             if (ZeroOrOne(str))
@@ -140,7 +138,7 @@ namespace Note
         /// <returns>True if their are duplicate inner strings. False, otherwise</returns>
         public static bool ContainsDuplicateStrings(this string str, string arg)
         {
-            if (str is null) throw new ArgumentNullException(nameof(str));
+            str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
             if (ZeroOrOne(str))
@@ -169,7 +167,7 @@ namespace Note
         /// <returns></returns>
         public static int CountLetters(this string str, char letter)
         {
-            if (str is null) throw new ArgumentNullException(nameof(str));
+            str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
             if (str.Length == 0)
             {
@@ -186,7 +184,7 @@ namespace Note
         /// <returns>The number of words in the string</returns>
         public static int CountWords(this string str)
         {
-            if (str is null) throw new ArgumentNullException(nameof(str));
+            str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
             if (str.Length == 0)
             {
@@ -209,7 +207,7 @@ namespace Note
         /// <returns>True if the string is a palindrome</returns>
         public static bool IsPalindrome(this string str, bool ignoreCase = false)
         {
-            if (str is null) throw new ArgumentNullException(nameof(str));
+            str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
             if (ZeroOrOne(str))
@@ -242,7 +240,7 @@ namespace Note
         /// <returns>True if the string strictly increases</returns>
         public static bool IsStrictlyDecreasing(this string str, bool ignoreCase = false)
         {
-            if (str is null) throw new ArgumentNullException(nameof(str));
+            str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
             if (ZeroOrOne(str))
@@ -271,7 +269,7 @@ namespace Note
         /// <returns>True if the string strictly increases</returns>
         public static bool IsStrictlyIncreasing(this string str, bool ignoreCase = false)
         {
-            if (str is null) throw new ArgumentNullException(nameof(str));
+            str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
             if (ZeroOrOne(str))
@@ -301,7 +299,7 @@ namespace Note
         /// <returns>True if the string is a valid date recognized by System.DateTime</returns>
         public static bool IsSystemDateTime(this string date, string formattingRegex)
         {
-            if (date is null) throw new ArgumentNullException(nameof(date));
+            date = date ?? throw new ArgumentNullException(nameof(date));
             if (formattingRegex is null) throw new ArgumentNullException(nameof(formattingRegex));
             Contract.EndContractBlock();
             if (date.Length == 0 || formattingRegex.Length == 0)
@@ -319,7 +317,7 @@ namespace Note
         /// <returns>True if the URI is valid</returns>
         public static bool IsValidURI(string URI)
         {
-            if (URI is null) throw new ArgumentNullException(nameof(URI));
+            URI = URI ?? throw new ArgumentNullException(nameof(URI));
             Contract.EndContractBlock();
             return Uri.TryCreate(URI, UriKind.Absolute, out Uri uriResult)
                 && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
@@ -354,7 +352,7 @@ namespace Note
         /// </code>
         public static bool IsWellFormed(this string str)
         {
-            if (str is null) throw new ArgumentNullException(nameof(str));
+            str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
             return ZeroOrOne(str) ? false : IsWellFormed(str, WellFormedUtility.DefaultAlphabet);
         }
@@ -397,7 +395,7 @@ namespace Note
         /// </code>
         public static bool IsWellFormed(this string str, Dictionary<char, char> alphabet)
         {
-            if (str is null) throw new ArgumentNullException(nameof(str));
+            str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
             if (ZeroOrOne(str))
@@ -421,7 +419,7 @@ namespace Note
         /// <returns>An ordered enumerable</returns>
         public static IEnumerable<string> OrderByLength(this IEnumerable<string> si)
         {
-            if (si is null) throw new ArgumentException(nameof(si));
+            si = si ?? throw new ArgumentException(nameof(si));
             return from strs in si orderby strs.Length ascending select strs;
         }
 
@@ -436,8 +434,8 @@ namespace Note
         /// <returns>The string with all characters in args removed</returns>
         public static string RemoveAll(this string str, bool ignoreCase = false, params IEnumerable<char>[] args)
         {
-            if (str is null) throw new ArgumentNullException(nameof(str));
-            if (args is null) throw new ArgumentNullException(nameof(args));
+            str = str ?? throw new ArgumentNullException(nameof(str));
+            args = args ?? throw new ArgumentNullException(nameof(args));
             Contract.EndContractBlock();
             if (args.Length == 0 || str.Length == 0)
             {
@@ -466,8 +464,8 @@ namespace Note
         /// <returns>The string with all characters in args removed</returns>
         public static string RemoveAll(this string str, bool ignoreCase = false, params IEnumerable<string>[] args)
         {
-            if (str is null) throw new ArgumentNullException(nameof(str));
-            if (args is null) throw new ArgumentNullException(nameof(args));
+            str = str ?? throw new ArgumentNullException(nameof(str));
+            args = args ?? throw new ArgumentNullException(nameof(args));
             Contract.EndContractBlock();
             if (args.Length == 0 || str.Length == 0)
             {
@@ -504,7 +502,7 @@ namespace Note
         /// <param name="index">The index to replace <paramref name="c"/></param>
         public static string ReplaceAt(this string str, int index, char c)
         {
-            if (str is null) throw new ArgumentException(nameof(str));
+            str = str ?? throw new ArgumentException(nameof(str));
             var sb = new StringBuilder(str);
             sb[index] = c;
             return sb.ToString();
@@ -518,7 +516,7 @@ namespace Note
         /// <returns>The reversed string</returns>
         public static string Reverse(this string str)
         {
-            if (str is null) throw new ArgumentNullException(nameof(str));
+            str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
             if (ZeroOrOne(str))
@@ -543,7 +541,7 @@ namespace Note
         /// <returns>The shuffled string</returns>
         public static string Shuffle(this string str, bool preserveSpaces = false)
         {
-            if (str is null) throw new ArgumentNullException(nameof(str));
+            str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
             if (ZeroOrOne(str))

@@ -1,6 +1,8 @@
 ﻿namespace Executable
 {
     using System;
+    using static Note.StringUtils;
+
 #if DEBUG
     /// <summary>
     /// For active debugging class libraries
@@ -9,7 +11,8 @@
     {
         static void Main()
         {
-            
+            string s = null;
+            Console.WriteLine(s.ContainsDigits());
         }
     }
 #endif
