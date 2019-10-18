@@ -11,7 +11,7 @@ namespace Note
     [Author("Manu Puduvalli")]
     public static class StringUtils
     {
-        public const char C_SP = (char)32;
+        private const char C_SP = (char)32;
 
         /// <summary>
         /// Converts a <see cref="IEnumerable{char}"/> to a string
