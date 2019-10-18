@@ -1,49 +1,41 @@
-﻿using System;
-using System.Globalization;
+﻿using Note.Attributes;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
+using System.Globalization;
 using System.Linq;
 using System.Text;
-using Note.Attributes;
-using System.Diagnostics.Contracts;
 
 namespace Note
 {
     [Author("Manu Puduvalli")]
     public static class StringUtils
     {
-
-        public const char SPACE = (char)32;
+        public const char C_SP = (char)32;
 
         /// <summary>
-        /// Reverses a string from left to right order while maintaining case sensitivity.
+        /// Converts a <see cref="IEnumerable{char}"/> to a string
         /// </summary>
-        /// <param name="str">The string to be reversed</param>
-        /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
-        /// <returns>The reversed string</returns>
-        public static string Reverse(this string str)
+        /// <param name="charEnumerable">The <see cref="IEnumerable{char}"/></param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="charEnumerable"/> is null</exception>
+        /// <returns>The converted string</returns>
+        public static string CharToString(IEnumerable<char> charEnumerable)
         {
-            if(str == null) throw new ArgumentNullException(nameof(str));
-            Contract.EndContractBlock();
-
-            if (ZeroOrOne(str))
-            {
-                return str;
-            }
-
-            var c = str.ToCharArray();
-            Array.Reverse(c);
-            return new string(value: c);
+            if (charEnumerable is null)
+                throw new ArgumentNullException(nameof(charEnumerable));
+            
+            return new string(charEnumerable as char[] ?? charEnumerable.ToArray());
         }
 
         /// <summary>
         /// Creates a string from the first character of the string to the first whitespace.
         /// </summary>
         /// <param name="str">The string to be chomped</param>
-        /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="str"/> is null</exception>
         /// <returns>The string retaining the first word</returns>
         public static string Chomp(this string str)
         {
-            if(str == null) throw new ArgumentNullException(nameof(str));
+            if (str is null) throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
             if (str.Length == 0)
@@ -52,7 +44,7 @@ namespace Note
             }
 
             int idx = str.IndexOf(string.Empty);
-            if(idx >= 0)
+            if (idx >= 0)
             {
                 return str.Substring(0, idx);
             }
@@ -67,11 +59,11 @@ namespace Note
         /// </summary>
         /// <param name="str">The string to be chomped</param>
         /// <param name="spaces">The amount of white space to chomp after</param>
-        /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="str"/> is null</exception>
         /// <returns>The string retaining the chomped word</returns>
         public static string ChompAfter(this string str, int spaces)
         {
-            if(str == null) throw new ArgumentNullException(nameof(str));
+            if (str is null) throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
             if (str.Length == 0)
             {
@@ -98,154 +90,14 @@ namespace Note
         }
 
         /// <summary>
-        /// Counts the number of words in a string
-        /// </summary>
-        /// <param name="str">The string to be used</param>
-        /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
-        /// <returns>The number of words in the string</returns>
-        public static int CountWords(this string str)
-        {
-            if(str == null) throw new ArgumentNullException(nameof(str));
-            Contract.EndContractBlock();
-            if (str.Length == 0)
-            {
-                return 0;
-            }
-            if(str.Length == 1)
-            {
-                return 1;
-            }
-            return str.Split().Length;
-        }
-
-        /// <summary>
-        /// Removes all instances of any number of characters from a specified string.
-        /// </summary>
-        /// <param name="str">The string to be used</param>
-        /// <param name="args">The characters which will be removed</param>
-        /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
-        /// <returns>The string with all characters in args removed</returns>
-        public static string RemoveAll(this string str, params IEnumerable<char>[] args)
-        {
-            if(str == null) throw new ArgumentNullException(nameof(str));
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            Contract.EndContractBlock();
-            if (args.Length == 0 || str.Length == 0)
-            {
-                return str;
-            }
-            var sb = new StringBuilder(str);
-            for (int i = 0; i < args.Length; i++)
-            {
-                sb.Replace(args[i].ToString(), string.Empty);
-            }
-            return sb.ToString();
-        }
-
-        /// <summary>
-        /// Removes all instances of any number of strings from a specified string.
-        /// </summary>
-        /// <param name="str">The string to be used</param>
-        /// <param name="args">The characters which will be removed</param>
-        /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
-        /// <returns>The string with all characters in args removed</returns>
-        public static string RemoveAll(this string str, params IEnumerable<string>[] args)
-        {
-            if(str == null) throw new ArgumentNullException(nameof(str));
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            Contract.EndContractBlock();
-            if (args.Length == 0 || str.Length == 0)
-            {
-                return str;
-            }
-            var sb = new StringBuilder(str);
-
-            for (int i = 0; i < str.Length; i++)
-            {
-                int cnt = args[i].Count();
-                var i_str = args[i].ToString();
-                if(cnt == 1)
-                {
-                    sb.Replace(i_str, string.Empty);
-                }
-                else
-                {
-                    int idxOfWord = sb.ToString().IndexOf(i_str);
-                    sb.Remove(idxOfWord, cnt);
-                }
-            }
-            return sb.ToString();
-        }
-
-        /// <summary>
-        /// Removes all instances of any number of characters from a specified string while ignoring case.
-        /// </summary>
-        /// <param name="str">The string to be used</param>
-        /// <param name="args">The characters which will be removed</param>
-        /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
-        /// <returns>The string with all characters in args removed</returns>
-        public static string RemoveAllIgnoreCase(this string str, params IEnumerable<char>[] args)
-        {
-            if(str == null) throw new ArgumentNullException(nameof(str));
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            Contract.EndContractBlock();
-            if (args.Length == 0 || str.Length == 0)
-            {
-                return str;
-            }
-            str = str.ToLower();
-            var sb = new StringBuilder(str);
-            for (int i = 0; i < args.Length; i++)
-            {
-                sb.Replace(args[i].ToString().ToLower(), string.Empty);
-            }
-            return sb.ToString();
-        }
-
-        /// <summary>
-        /// Removes all instances of any number of strings from a specified string while ignoring case.
-        /// </summary>
-        /// <param name="str">The string to be used</param>
-        /// <param name="args">The characters which will be removed</param>
-        /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
-        /// <returns>The string with all characters in args removed</returns>
-        public static string RemoveAllIgnoreCase(this string str, params IEnumerable<string>[] args)
-        {
-            if(str == null) throw new ArgumentNullException(nameof(str));
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            Contract.EndContractBlock();
-            if (args.Length == 0 || str.Length == 0)
-            {
-                return str;
-            }
-            str = str.ToLower();
-            var sb = new StringBuilder(str);
-            for (int i = 0; i < args.Length; i++)
-            {
-                var cnt = args[i].Count();
-                var i_str = args[i].ToString().ToLower();
-                if (cnt == 1)
-                {
-                    sb.Replace(i_str, string.Empty);
-                }
-                else
-                {
-                    int idxOfWord = sb.ToString().IndexOf(i_str);
-                    sb.Remove(idxOfWord, cnt);
-                }
-            }
-            return sb.ToString();
-        }
-
-        /// <summary>
         /// Checks if a given string contains any digits.
         /// </summary>
         /// <param name="str">The string to be used</param>
-        /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="str"/> is null</exception>
         /// <returns>True if the string contains any digits, false otherwise</returns>
         public static bool ContainsDigits(this string str)
         {
-            if(str == null) throw new ArgumentNullException(nameof(str));
+            if (str is null) throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
             if (str.Length == 0)
             {
@@ -255,33 +107,14 @@ namespace Note
         }
 
         /// <summary>
-        /// Checks if a given string is a valid date used by System.DateTime
+        /// Checks whether a string contains duplicate characters.
         /// </summary>
         /// <param name="str">The string to be used</param>
-        /// <param name="format">The date format regex</param>
-        /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
-        /// <returns>True if the string is a valid date recognized by System.DateTime</returns>
-        public static bool IsSystemDateTime(this string date, string formattingRegex)
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="str"/> is null</exception>
+        /// <returns>True if their are duplicate characters. False, otherwise</returns>
+        public static bool ContainsDuplicateChars(this string str)
         {
-            if (date == null) throw new ArgumentNullException(nameof(date));
-            if (formattingRegex == null) throw new ArgumentNullException(nameof(formattingRegex));
-            Contract.EndContractBlock();
-            if (date.Length == 0 || formattingRegex.Length == 0)
-            {
-                return false;
-            }
-            return DateTime.TryParseExact(date, formattingRegex, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt);
-        }
-
-        /// <summary>
-        /// Checks if each character in a string is lexicographically greater than the previous character.
-        /// </summary>
-        /// <param name="str">The string to be used</param>
-        /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
-        /// <returns>True if the string strictly increases</returns>
-        public static bool IsStrictlyIncreasing(this string str)
-        {
-            if(str == null) throw new ArgumentNullException(nameof(str));
+            if (str is null) throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
             if (ZeroOrOne(str))
@@ -289,23 +122,25 @@ namespace Note
                 return false;
             }
 
-            for (var i = 0; i < str.Length - 1; i++)
-            {
-                if (str[i] > str[i + 1]) return false;
-            }
+            var set = new HashSet<char>();
+            for (int i = 0; i < str.Length; i++)
+                //User overloaded operator for Add
+                if (!set.Add(str[i]))
+                    return false;
             return true;
         }
 
         /// <summary>
-        /// Checks if each character in a string is lexicographically greater than the previous character
-        /// while ignoring case.
+        /// Checks whether a string contains duplicate inner strings.
         /// </summary>
         /// <param name="str">The string to be used</param>
-        /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
-        /// <returns>True if the string strictly increases</returns>
-        public static bool IsStrictlyIncreasingIgnoreCase(this string str)
+        /// <param name="arg">The inner string to search for duplicates</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="str"/> is null</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="arg"/> is null</exception>
+        /// <returns>True if their are duplicate inner strings. False, otherwise</returns>
+        public static bool ContainsDuplicateStrings(this string str, string arg)
         {
-            if(str == null) throw new ArgumentNullException(nameof(str));
+            if (str is null) throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
             if (ZeroOrOne(str))
@@ -313,9 +148,87 @@ namespace Note
                 return false;
             }
 
-            for (var i = 0; i < str.Length - 1; i++)
+            if (arg is null)
             {
-                if (str[i] > str[i + 1]) return false;
+                return false;
+            }
+
+            var regex = new System.Text.RegularExpressions.Regex(
+                pattern: System.Text.RegularExpressions.Regex.Escape(arg));
+            var rem = regex.Replace(str, string.Empty, 1);
+            var secondRem = rem.Replace(arg, string.Empty);
+            return !(rem == secondRem);
+        }
+
+        /// <summary>
+        /// Counts how many times a given letter appears in a string.
+        /// </summary>
+        /// <param name="str">The string to be used</param>
+        /// <param name="letter">The specfic letter to search</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="str"/> is null</exception>
+        /// <returns></returns>
+        public static int CountLetters(this string str, char letter)
+        {
+            if (str is null) throw new ArgumentNullException(nameof(str));
+            Contract.EndContractBlock();
+            if (str.Length == 0)
+            {
+                return 0;
+            }
+            return (from chars in str where chars == letter select chars).Count();
+        }
+
+        /// <summary>
+        /// Counts the number of words in a string.
+        /// </summary>
+        /// <param name="str">The string to be used</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="str"/> is null</exception>
+        /// <returns>The number of words in the string</returns>
+        public static int CountWords(this string str)
+        {
+            if (str is null) throw new ArgumentNullException(nameof(str));
+            Contract.EndContractBlock();
+            if (str.Length == 0)
+            {
+                return 0;
+            }
+            if (str.Length == 1)
+            {
+                return 1;
+            }
+            return str.Split(new char[] { C_SP, '\r', '\n' },
+                options: StringSplitOptions.RemoveEmptyEntries).Length;
+        }
+
+        /// <summary>
+        /// Checks if a given string is a palindrome.
+        /// </summary>
+        /// <param name="str">The string to be used</param>
+        /// <param name="ignoreCase">Whether case should be ignored</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="str"/> is null</exception>
+        /// <returns>True if the string is a palindrome</returns>
+        public static bool IsPalindrome(this string str, bool ignoreCase = false)
+        {
+            if (str is null) throw new ArgumentNullException(nameof(str));
+            Contract.EndContractBlock();
+
+            if (ZeroOrOne(str))
+            {
+                return true;
+            }
+
+            if (ignoreCase)
+            {
+                str = str.ToLower();
+            }
+            int j;
+            for (var i = 0; i < str.Length; i++)
+            {
+                j = str.Length - 1 - i;
+                if (str[i] != str[j])
+                {
+                    return false;
+                }
             }
             return true;
         }
@@ -324,16 +237,22 @@ namespace Note
         /// Checks if each character in a string is lexicographically smaller than the previous character.
         /// </summary>
         /// <param name="str">The string to be used</param>
-        /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
+        /// <param name="ignoreCase">Whether case should be ignored</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="str"/> is null</exception>
         /// <returns>True if the string strictly increases</returns>
-        public static bool IsStrictlyDecreasing(this string str)
+        public static bool IsStrictlyDecreasing(this string str, bool ignoreCase = false)
         {
-            if(str == null) throw new ArgumentNullException(nameof(str));
+            if (str is null) throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
             if (ZeroOrOne(str))
             {
                 return false;
+            }
+
+            if (ignoreCase)
+            {
+                str = str.ToLower();
             }
 
             for (int i = 0; i < str.Length - 1; i++)
@@ -344,15 +263,15 @@ namespace Note
         }
 
         /// <summary>
-        /// Checks if each character in a string is lexicographically smaller than the previous character
-        /// while ignoring case.
+        /// Checks if each character in a string is lexicographically greater than the previous character.
         /// </summary>
         /// <param name="str">The string to be used</param>
-        /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
+        /// <param name="ignoreCase">Whether case should be ignored</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="str"/> is null</exception>
         /// <returns>True if the string strictly increases</returns>
-        public static bool IsStrictlyDecreasingIgnoreCase(this string str)
+        public static bool IsStrictlyIncreasing(this string str, bool ignoreCase = false)
         {
-            if(str == null) throw new ArgumentNullException(nameof(str));
+            if (str is null) throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
             if (ZeroOrOne(str))
@@ -360,7 +279,12 @@ namespace Note
                 return false;
             }
 
-            for (int i = 0; i < str.Length - 1; i++)
+            if (ignoreCase)
+            {
+                str = str.ToLower();
+            }
+
+            for (var i = 0; i < str.Length - 1; i++)
             {
                 if (str[i] > str[i + 1]) return false;
             }
@@ -368,60 +292,37 @@ namespace Note
         }
 
         /// <summary>
-        /// Checks if a given string is a palindrome.
+        /// Checks if a given string is a valid date used by System.DateTime
         /// </summary>
         /// <param name="str">The string to be used</param>
-        /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
-        /// <returns>True if the string is a palindrome</returns>
-        public static bool IsPalindrome(this string str)
+        /// <param name="formattingRegex">The date format regex</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="date"/> is null</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="formattingRegex"/> is null</exception>
+        /// <returns>True if the string is a valid date recognized by System.DateTime</returns>
+        public static bool IsSystemDateTime(this string date, string formattingRegex)
         {
-            if(str == null) throw new ArgumentNullException(nameof(str));
+            if (date is null) throw new ArgumentNullException(nameof(date));
+            if (formattingRegex is null) throw new ArgumentNullException(nameof(formattingRegex));
             Contract.EndContractBlock();
-
-            if (ZeroOrOne(str))
+            if (date.Length == 0 || formattingRegex.Length == 0)
             {
-                return true;
+                return false;
             }
-
-            //All palindromes that exist are less than Int32.MaxValue
-            for (var advancing = 0; advancing < str.Length; advancing++)
-            {
-                int retrograding = str.Length - 1 - advancing;
-                if (str[advancing] != str[retrograding])
-                {
-                    return false;
-                }
-            }
-            return true;
+            return DateTime.TryParseExact(date, formattingRegex, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt);
         }
 
         /// <summary>
-        /// Checks if a given string is a palindrome while ignoring casing.
+        /// Checks if a given string is a valid URI. This checks both HTTP and HTTPS URLs.
         /// </summary>
-        /// <param name="str">The string to be used</param>
-        /// <exception cref="ArgumentNullException">Thrown when the string is null</exception>
-        /// <returns>True if the string is a palindrome</returns>
-        public static bool IsPalindromeIgnoreCase(this string str)
+        /// <param name="URI">The string to be used</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="URI"/> is null</exception>
+        /// <returns>True if the URI is valid</returns>
+        public static bool IsValidURI(string URI)
         {
-            if(str == null) throw new ArgumentNullException(nameof(str));
+            if (URI is null) throw new ArgumentNullException(nameof(URI));
             Contract.EndContractBlock();
-
-            if (ZeroOrOne(str))
-            {
-                return true;
-            }
-
-            //All palindromes that exist are less than Int32.MaxValue
-            str = str.ToLower();
-            for (var advancing = 0; advancing < str.Length; advancing++)
-            {
-                int retrograding = str.Length - 1 - advancing;
-                if (str[advancing] != str[retrograding])
-                {
-                    return false;
-                }
-            }
-            return true;
+            return Uri.TryCreate(URI, UriKind.Absolute, out Uri uriResult)
+                && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
         }
 
         /// <summary>
@@ -430,17 +331,18 @@ namespace Note
         /// closing character. For every inner string, with the exception
         /// of characters not defined in the alphabet, in between an opening
         /// and closing character, if that string were to be split in half,
-        /// each half would be a mirror image of each other. A well formed 
-        /// string consists of the default alphabet constists of the following 
+        /// each half would be a mirror image of each other. A well formed
+        /// string consists of the default alphabet constists of the following
         /// characters: '(',')','{','}','[',']','<','>'.
         /// </summary>
         /// <param name="str">the string to check</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="str"/> is null</exception>
         /// <returns>whether the string is well formed</returns>
         /// <example>The following demonstrates how to use the <see cref="IsWellFormed(string)"/> method.</example>
         /// <code>
         ///
         /// using static Utilities.StringUtils;
-        /// 
+        ///
         /// class TestClass
         /// {
         ///     static void Main(string[] args)
@@ -452,7 +354,7 @@ namespace Note
         /// </code>
         public static bool IsWellFormed(this string str)
         {
-            if (str == null) throw new ArgumentNullException(nameof(str));
+            if (str is null) throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
             return ZeroOrOne(str) ? false : IsWellFormed(str, WellFormedUtility.DefaultAlphabet);
         }
@@ -463,7 +365,7 @@ namespace Note
         /// closing character. For every inner string, with the exception
         /// of characters not defined in the alphabet, in between an opening
         /// and closing character, if that string were to be split in half,
-        /// each half would be a mirror image of each other. A well formed 
+        /// each half would be a mirror image of each other. A well formed
         /// string consists of the user specified Dictionary of key-value
         /// pairs, where the key is the opening character and the value
         /// is the closing character.
@@ -471,8 +373,9 @@ namespace Note
         /// <param name="str">the string to check</param>
         /// <param name="alphabet">the dictionary of key value pairs - where the key
         /// represents the opening character and the value represents the closing character</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="str"/> is null</exception>
         /// <returns>whether the string is well formed</returns>
-        /// <example>The following demonstrates how to use the 
+        /// <example>The following demonstrates how to use the
         /// <see cref="IsWellFormed(string, Dictionary{char, char})"/> method.</example>
         /// <code>
         ///
@@ -494,7 +397,7 @@ namespace Note
         /// </code>
         public static bool IsWellFormed(this string str, Dictionary<char, char> alphabet)
         {
-            if (str == null) throw new ArgumentNullException(nameof(str));
+            if (str is null) throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
             if (ZeroOrOne(str))
@@ -502,7 +405,7 @@ namespace Note
                 return false;
             }
 
-            if (alphabet == null)
+            if (alphabet is null)
             {
                 return IsWellFormed(str);
             }
@@ -511,130 +414,136 @@ namespace Note
         }
 
         /// <summary>
-        /// A utility class that contains functions to determine
-        /// whether a string is a well formed string.
+        /// Orders an enumerable by its length in ascending order (natural order).
         /// </summary>
-        [Author("Manu Puduvalli")]
-        private class WellFormedUtility
+        /// <param name="si">the <see cref="IEnumerable{string}"/> si</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="str"/> is null</exception>
+        /// <returns>An ordered enumerable</returns>
+        public static IEnumerable<string> OrderByLength(this IEnumerable<string> si)
         {
-            /// <summary>
-            /// The default alphabet
-            /// </summary>
-            public static Dictionary<char, char> DefaultAlphabet { get; }
-                = new Dictionary<char, char>(4)
-            {
-                { '(', ')' },
-                { '{', '}' },
-                { '[', ']' },
-                { '<', '>' },
-            };
-
-            /// <summary>
-            /// An instance of the Dictionary containing this alphabet.
-            /// </summary>
-            private readonly Dictionary<char, char> Alphabet;
-
-            /// <summary>
-            /// Contructor that sets up the alphabet
-            /// </summary>
-            /// <param name="dct"></param>
-            public WellFormedUtility(Dictionary<char,char> dct)
-            {
-                Alphabet = dct ?? throw new ArgumentNullException(nameof(dct));
-            }
-
-            /// <summary>
-            /// Verifies the "well formedness" of the string by using
-            /// a stack data structure to measure the balance of the string.
-            /// </summary>
-            /// <param name="inp">The input string</param>
-            /// <returns></returns>
-            public bool Run(string inp)
-            {
-                var stk = new Stack<char>(10);
-                try
-                {
-                    foreach (var c in inp)
-                    {
-                        if (!Alphabet.ContainsKey(c) && !Alphabet.ContainsValue(c)) continue;
-                        if (Alphabet.ContainsKey(c)) stk.Push(c);
-                        else
-                            if (Alphabet[stk.Pop()] != c)
-                                return false;
-                    }
-                }
-                catch (Exception ex) when (ex is InvalidOperationException ||
-                                           ex is NullReferenceException)
-                {
-                    return false;
-                }
-                return true;
-            }
-        } //WellFormedUtilities
+            if (si is null) throw new ArgumentException(nameof(si));
+            return from strs in si orderby strs.Length ascending select strs;
+        }
 
         /// <summary>
-        /// Checks whether a string contains duplicate characters.
+        /// Removes all instances of any number of characters from a specified string.
         /// </summary>
         /// <param name="str">The string to be used</param>
-        /// <returns>True if their are duplicate characters. False, otherwise</returns>
-        public static bool ContainsDuplicateChars(this string str)
+        /// <param name="ignoreCase">Whether case should be ignored</param>
+        /// <param name="args">The characters which will be removed</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="str"/> is null</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="args"/> is null</exception>
+        /// <returns>The string with all characters in args removed</returns>
+        public static string RemoveAll(this string str, bool ignoreCase = false, params IEnumerable<char>[] args)
         {
-            if (str == null) throw new ArgumentNullException(nameof(str));
+            if (str is null) throw new ArgumentNullException(nameof(str));
+            if (args is null) throw new ArgumentNullException(nameof(args));
             Contract.EndContractBlock();
-
-            if (ZeroOrOne(str))
+            if (args.Length == 0 || str.Length == 0)
             {
-                return false;
+                return str;
             }
+            if (ignoreCase)
+            {
+                str = str.ToLower();
+            }
+            var sb = new StringBuilder(str);
+            for (int i = 0; i < args.Length; i++)
+            {
+                sb.Replace(args[i].ToString(), string.Empty);
+            }
+            return sb.ToString();
+        }
 
-            var set = new HashSet<char>();
+        /// <summary>
+        /// Removes all instances of any number of strings from a specified string.
+        /// </summary>
+        /// <param name="str">The string to be used</param>
+        /// <param name="ignoreCase">Whether case should be ignored</param>
+        /// <param name="args">The characters which will be removed</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="str"/> is null</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="args"/> is null</exception>
+        /// <returns>The string with all characters in args removed</returns>
+        public static string RemoveAll(this string str, bool ignoreCase = false, params IEnumerable<string>[] args)
+        {
+            if (str is null) throw new ArgumentNullException(nameof(str));
+            if (args is null) throw new ArgumentNullException(nameof(args));
+            Contract.EndContractBlock();
+            if (args.Length == 0 || str.Length == 0)
+            {
+                return str;
+            }
+            if (ignoreCase)
+            {
+                str = str.ToLower();
+            }
+            var sb = new StringBuilder(str);
+
             for (int i = 0; i < str.Length; i++)
-                //User overloaded operator for Add
-                if (!set.Add(str[i]))
-                    return false;
-            return true;
+            {
+                int cnt = args[i].Count();
+                var i_str = args[i].ToString();
+                if (cnt == 1)
+                {
+                    sb.Replace(i_str, string.Empty);
+                }
+                else
+                {
+                    int idxOfWord = sb.ToString().IndexOf(i_str);
+                    sb.Remove(idxOfWord, cnt);
+                }
+            }
+            return sb.ToString();
         }
 
         /// <summary>
-        /// Checks whether a string contains duplicate inner strings.
+        /// Replaces a character at a specific index in a string, only once.
         /// </summary>
         /// <param name="str">The string to be used</param>
-        /// <param name="arg">The inner string to search for duplicates</param>
-        /// <returns>True if their are duplicate inner strings. False, otherwise</returns>
-        public static bool ContainsDuplicateStrings(this string str, string arg)
+        /// <param name="c">The character to replace</param>
+        /// <param name="index">The index to replace <paramref name="c"/></param>
+        public static string ReplaceAt(this string str, int index, char c)
         {
-            if (str == null) throw new ArgumentNullException(nameof(str));
+            if (str is null) throw new ArgumentException(nameof(str));
+            var sb = new StringBuilder(str);
+            sb[index] = c;
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Reverses a string from left to right order while maintaining case sensitivity.
+        /// </summary>
+        /// <param name="str">The string to be reversed</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="str"/> is null</exception>
+        /// <returns>The reversed string</returns>
+        public static string Reverse(this string str)
+        {
+            if (str is null) throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
             if (ZeroOrOne(str))
             {
-                return false;
+                return str;
             }
 
-            if (arg == null)
-            {
-                return false;
-            }
-
-            var regex = new System.Text.RegularExpressions.Regex(
-                pattern: System.Text.RegularExpressions.Regex.Escape(arg));
-            var rem = regex.Replace(str, string.Empty, 1);
-            var secondRem = rem.Replace(arg, string.Empty);
-            return !(rem == secondRem);
+            var c = str.ToCharArray();
+            Array.Reverse(c);
+            return new string(value: c);
         }
 
         /// <summary>
-        /// Shuffle's characters in a string. The methodology used to generate random 
+        /// Shuffle's characters in a string. The methodology used to generate random
         /// indeces used for shuffling is cryptographically strong. Due to this nature,
-        /// there is no guarantee that the return string will be entirely different 
+        /// there is no guarantee that the return string will be entirely different
         /// than the original.
         /// </summary>
         /// <param name="str">The string to be shuffled</param>
         /// <param name="preserveSpaces">Determines whether to shuffle spaces or not</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="str"/> is null</exception>
         /// <returns>The shuffled string</returns>
         public static string Shuffle(this string str, bool preserveSpaces = false)
         {
-            if (str == null) throw new ArgumentNullException(nameof(str));
+            if (str is null) throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
             if (ZeroOrOne(str))
@@ -644,11 +553,11 @@ namespace Note
 
             if (preserveSpaces)
             {
-                if (str.Contains(SPACE))
+                if (str.Contains(C_SP))
                 {
-                    string[] spaceSplit = str.Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
+                    var spaceSplit = str.Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
 
-                    for(int i = 0; i < spaceSplit.Length; i++)
+                    for (var i = 0; i < spaceSplit.Length; i++)
                     {
                         if (!ZeroOrOne(spaceSplit[i]))
                         {
@@ -662,22 +571,30 @@ namespace Note
         }
 
         /// <summary>
+        /// Returns true if the length of the string is zero or one.
+        /// </summary>
+        /// <param name="str">The string to be used</param>
+        /// <returns>True if the length of the string is zero or one</returns>
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        internal static bool ZeroOrOne(string str) => str.Length == 0 || str.Length == 1;
+
+        /// <summary>
         /// A utility class to shuffle a string.
         /// </summary>
         [Author("Manu Puduvalli")]
         private protected class ShuffleUtility
         {
-            private readonly string str;
             private readonly StringBuilder sb;
+            private readonly string str;
 
             /// <summary>
-            /// Creates an instance of the ShuffleUtility and instantiates 
+            /// Creates an instance of the ShuffleUtility and instantiates
             /// any fields.
             /// </summary>
             /// <param name="str">The string to be shuffled</param>
             public ShuffleUtility(string str)
             {
-                //Null Check because constructor is public and class is private protected 
+                //Null Check because constructor is public and class is private protected
                 this.str = str ?? throw new ArgumentNullException(nameof(str));
                 sb = new StringBuilder(str);
             }
@@ -687,57 +604,56 @@ namespace Note
             /// being less biased than System.Random. For each character that exists
             /// in the string, a swap occurs two times. Four characters are randomly
             /// chosen from the string and their indeces are stored. The index values
-            /// occur from the range of [0, length). In addition, two randomly chosen 
-            /// numbers are created in order to decide which two indeces are swapped 
-            /// first. 
-            /// </summary>
-            /// <returns>The shuffled string</returns>
-            /// <example>
-            /// Here is a visual example of the shuffling algorithm described in the 
-            /// summary:
-            /// -- Note: In the loop below, the values in this example are chosen 
-            ///    arbitrarily and will not necessarily be the same values on each 
+            /// occur from the range of [0, length). In addition, two randomly chosen
+            /// numbers are created in order to decide which two indeces are swapped
+            /// first.
+            ///
+            /// The following is a visual example of the shuffling algorithm described
+            /// in the summary:
+            /// -- Note: In the loop below, the values in this example are chosen
+            ///    arbitrarily and will not necessarily be the same values on each
             ///    iteration.
-            ///    
+            ///
             /// -- Assume the string -> "Thiscanbeareallylongstring"
-            /// 
-            /// -- loop begins: 
-            /// 
-            /// -- Four indeces (w, x, y, z) are chosen at random -> 3, 10, 7, 20
-            /// 
+            ///
+            /// -- loop begins:
+            ///
+            /// -- Four indeces (w, x, y, z) are chosen at random: [3, 10, 7, 20]
+            ///
             /// -- Two more random values (a, b) are chosen in the range of [1,4]
             ///    where each value represents one of the four index values.
-            ///    
-            /// -- Given every possible combination of [1,4] with combination size 's' 
-            ///    where 's' equals 2, the random values 'a' and 'b' match a possible 
+            ///
+            /// -- Given every possible combination of [1,4] with combination size 's'
+            ///    where 's' equals 2, the random values 'a' and 'b' match a possible
             ///    combination and perform two swaps.
-            ///    
-            ///         -- If value 'a' is 2 and value 'b' is 4 (or vice versa), then 
-            ///            indeces 'x' and 'z' are swapped first, subsequently followed 
+            ///
+            ///         -- If value 'a' is 2 and value 'b' is 4 (or vice versa), then
+            ///            indeces 'x' and 'z' are swapped first, subsequently followed
             ///            by the swap of indeces 'w' and 'y'.
-            ///            
-            ///         -- In the event that value 'a' and 'b' are the same value, 
+            ///
+            ///         -- In the event that value 'a' and 'b' are the same value,
             ///            the same random values used for generating 'a' and b'
-            ///            are reused in order to generate 2 values (d, e) in the 
+            ///            are reused in order to generate 2 values (d, e) in the
             ///            range, [1, 2]. The value 'd' decides whether 'a' or 'b'
             ///            will be changed value. For example, if 'd' evaluates
-            ///            to 1, then value 'a' is guaranteed to change. If 'd' 
+            ///            to 1, then value 'a' is guaranteed to change. If 'd'
             ///            evaluates to 2, however, then value 'b' is guaranteed change.
             ///            Value 'e' decides whether to increment or decrement the number
-            ///            in order to break the the tie between values 'a' and 'b'. 
+            ///            in order to break the the tie between values 'a' and 'b'.
             ///            If 'e' is 1, either 'a' or 'b' is decremented. If 'e' is 2,
             ///            either 'a' or 'b is incremented. Special consideration is taken
             ///            for the edge cases (if 'a' or 'b' holds the value 1 or 4).
-            ///            
+            ///
             /// -- The current state of the string is -> "Thibcanseaseallylongrtring
-            /// 
+            ///
             /// -- Loop 'n' times where 'n' is the size of the string
-            /// 
-            /// -- For each letter in the string, a maximum of four character swaps may occur. 
+            ///
+            /// -- For each letter in the string, a maximum of four character swaps may occur.
             ///    If swapping values are the same, then a swap does not occur.
-            /// </example>
-            public string ShuffleThis() {
-
+            /// </summary>
+            /// <returns>The shuffled string</returns>
+            public string ShuffleThis()
+            {
                 using (var rngcsp = new System.Security.Cryptography.RNGCryptoServiceProvider())
                 {
                     var len = str.Length;
@@ -753,11 +669,11 @@ namespace Note
                         rngcsp.GetBytes(_2);
                         rngcsp.GetBytes(_3);
                         rngcsp.GetBytes(_4);
-                        
-                        var one     = (int)(Math.Abs(BitConverter.ToInt64(_1, 0)) % (len - 1) + 1);
-                        var two     = (int)(Math.Abs(BitConverter.ToInt64(_2, 0)) % (len - 1) + 1);
-                        var three   = (int)(Math.Abs(BitConverter.ToInt64(_3, 0)) % (len - 1) + 1);
-                        var four    = (int)(Math.Abs(BitConverter.ToInt64(_4, 0)) % (len - 1) + 1);
+
+                        var one = (int)(Math.Abs(BitConverter.ToInt64(_1, 0)) % (len - 1) + 1);
+                        var two = (int)(Math.Abs(BitConverter.ToInt64(_2, 0)) % (len - 1) + 1);
+                        var three = (int)(Math.Abs(BitConverter.ToInt64(_3, 0)) % (len - 1) + 1);
+                        var four = (int)(Math.Abs(BitConverter.ToInt64(_4, 0)) % (len - 1) + 1);
 
                         var indexOne = new byte[8];
                         rngcsp.GetBytes(data: indexOne);
@@ -770,12 +686,12 @@ namespace Note
                         var randOne = (int)(longIndexOne % 4 + 1);
                         var randTwo = (int)(longIndexTwo % 4 + 1);
 
-                        if(randOne == randTwo)
+                        if (randOne == randTwo)
                         {
                             var chooser = (int)(longIndexOne % 2 + 1);
                             var changer = (int)(longIndexTwo % 2 + 1);
 
-                            if(chooser == 1)
+                            if (chooser == 1)
                             {
                                 if (randOne == 1) randOne++;
                                 else if (randOne == 4) randOne--;
@@ -788,7 +704,7 @@ namespace Note
                                 else randTwo = changer == 1 ? randTwo - 1 : randTwo + 1;
                             }
                         }
-
+                        //All combinations of [1-4]
                         if ((randOne == 1 && randTwo == 2) || (randOne == 2 && randTwo == 1))
                         {
                             ShuffleSwapper(sb, one, two, three, four);
@@ -817,6 +733,7 @@ namespace Note
                 }
                 return sb.ToString();
             }
+
             private void ShuffleSwapper(StringBuilder sb, int indexOne, int indexTwo, int indexThree, int indexFour)
             {
                 //Contract.Requires<ArgumentNullException>(sb != null);
@@ -838,7 +755,65 @@ namespace Note
             }
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private static bool ZeroOrOne(string str) => str.Length == 0 || str.Length == 1;
-    } //StringUtils 
+        /// <summary>
+        /// A utility class that contains functions to determine
+        /// whether a string is a well formed string.
+        /// </summary>
+        [Author("Manu Puduvalli")]
+        private class WellFormedUtility
+        {
+            /// <summary>
+            /// An instance of the Dictionary containing this alphabet.
+            /// </summary>
+            private readonly Dictionary<char, char> Alphabet;
+
+            /// <summary>
+            /// Contructor that sets up the alphabet
+            /// </summary>
+            /// <param name="dct">A dictionary representing an alphabet</param>
+            public WellFormedUtility(Dictionary<char, char> dct)
+            {
+                Alphabet = dct ?? throw new ArgumentNullException(nameof(dct));
+            }
+
+            /// <summary>
+            /// The default alphabet
+            /// </summary>
+            public static Dictionary<char, char> DefaultAlphabet { get; }
+                = new Dictionary<char, char>(4)
+            {
+                { '(', ')' },
+                { '{', '}' },
+                { '[', ']' },
+                { '<', '>' },
+            };
+
+            /// <summary>
+            /// Verifies the "well formedness" of the string by using
+            /// a stack data structure to measure the balance of the string.
+            /// </summary>
+            /// <param name="inp">The input string</param>
+            /// <returns></returns>
+            public bool Run(string inp)
+            {
+                var stk = new Stack<char>(10);
+                try
+                {
+                    foreach (var c in inp)
+                    {
+                        if (!Alphabet.ContainsKey(c) && !Alphabet.ContainsValue(c)) continue;
+                        if (Alphabet.ContainsKey(c)) stk.Push(c);
+                        else if (Alphabet[stk.Pop()] != c)
+                            return false;
+                    }
+                }
+                catch (Exception ex) when (ex is InvalidOperationException ||
+                                           ex is NullReferenceException)
+                {
+                    return false;
+                }
+                return true;
+            }
+        } //WellFormedUtilities
+    } //StringUtils
 } //Note

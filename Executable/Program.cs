@@ -1,6 +1,6 @@
 ﻿namespace Executable
 {
-
+    using System;
 #if DEBUG
     /// <summary>
     /// For active debugging class libraries
@@ -9,7 +9,7 @@
     {
         static void Main()
         {
-
+            
         }
     }
 #endif
