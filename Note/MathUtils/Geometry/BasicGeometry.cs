@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using static System.Math;
 
-namespace Note.MathUtils.Geometry
+namespace Note.MathUtils
 {
     public static class BasicGeometry
     {

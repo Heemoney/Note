@@ -6,7 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-namespace Note
+namespace Note.Strings
 {
     [Author("Manu Puduvalli")]
     public static class StringUtils
@@ -70,7 +70,7 @@ namespace Note
             if (spaces != 0)
             {
                 var matching_num_spaces = 0;
-                for (int i = 0; i < str.Length; i++)
+                for (var i = 0; i < str.Length; i++)
                 {
                     if (char.IsWhiteSpace(str[i]))
                     {
@@ -121,7 +121,7 @@ namespace Note
             }
 
             var set = new HashSet<char>();
-            for (int i = 0; i < str.Length; i++)
+            for (var i = 0; i < str.Length; i++)
                 //User overloaded operator for Add
                 if (!set.Add(str[i]))
                     return false;
@@ -253,7 +253,7 @@ namespace Note
                 str = str.ToLower();
             }
 
-            for (int i = 0; i < str.Length - 1; i++)
+            for (var i = 0; i < str.Length - 1; i++)
             {
                 if (str[i] < str[i + 1]) return false;
             }
@@ -412,6 +412,66 @@ namespace Note
         }
 
         /// <summary>
+        /// Finds the longest common prefix of a group of strings of type 
+        /// <see cref="IEnumerable{string}"/>
+        /// </summary>
+        /// <param name="strs">A group of strings to find the common prefix</param>
+        /// <returns>The longest common prefix</returns>
+        public static string LongestCommonPrefix(this IEnumerable<string> strs, bool ignoreCase = false)
+        {
+            int FindMin()
+            {
+                var min = strs.ElementAt(0).Length;
+                foreach (string s in strs)
+                {
+                    if (s.Length < min)
+                        min = s.Length;
+                }
+                return min;
+            }
+
+            bool CheckContain(string str, int st, int end)
+            {
+                foreach (var word in strs)
+                {
+                    for (int j = st; j <= end; j++)
+                    {
+                        if (word[j] != str[j])
+                            return false;
+                    }
+                }
+                return true;
+            }
+
+            if (strs is null) throw new ArgumentNullException();
+            Contract.EndContractBlock();
+            if (strs.Count() == 1) return strs.ElementAt(0);
+
+            if (ignoreCase)
+                foreach (string s in strs) s.ToLower();
+
+            int minLength = FindMin();
+            var sb = new StringBuilder();
+            string mainWord = strs.ElementAt(0);
+
+            int low = 0, high = minLength - 1;
+            while (low <= high)
+            {
+                var mid = low + (high - low) / 2;
+                if (CheckContain(mainWord, low, mid))
+                {
+                    sb.Append(mainWord.Substring(low, (mid + 1) - low));
+                    low = mid + 1;
+                }
+                else
+                {
+                    high = mid - 1;
+                }
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
         /// Orders an enumerable by its length in ascending order (natural order).
         /// </summary>
         /// <param name="si">the <see cref="IEnumerable{string}"/> si</param>
@@ -446,7 +506,7 @@ namespace Note
                 str = str.ToLower();
             }
             var sb = new StringBuilder(str);
-            for (int i = 0; i < args.Length; i++)
+            for (var i = 0; i < args.Length; i++)
             {
                 sb.Replace(args[i].ToString(), string.Empty);
             }
@@ -477,7 +537,7 @@ namespace Note
             }
             var sb = new StringBuilder(str);
 
-            for (int i = 0; i < str.Length; i++)
+            for (var i = 0; i < str.Length; i++)
             {
                 int cnt = args[i].Count();
                 var i_str = args[i].ToString();
@@ -566,6 +626,21 @@ namespace Note
                 }
             }
             return new ShuffleUtility(str).ShuffleThis();
+        }
+
+        /// <summary>
+        /// Performs a Substring given a starting and ending index, similar to Java.
+        /// The operation is performed mathematically as [startIndex, endIndex).
+        /// </summary>
+        /// <param name="str">The given string</param>
+        /// <param name="startIndex">The inclusive starting index of <paramref name="str"/></param>
+        /// <param name="endIndex">The exclusive ending index of <paramref name="str"/></param>
+        /// <returns>A string that is equivalent to the substring that begins at startIndex in this 
+        /// instance, or Empty if startIndex is equal to the length of this instance.</returns>
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static string Substring(this string str, int startIndex, int endIndex)
+        {
+            return str.Substring(startIndex, (endIndex - startIndex) + 1);
         }
 
         /// <summary>
@@ -752,7 +827,6 @@ namespace Note
                 }
             }
         }
-
         /// <summary>
         /// A utility class that contains functions to determine
         /// whether a string is a well formed string.

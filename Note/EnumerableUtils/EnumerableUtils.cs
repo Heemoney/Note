@@ -1,16 +1,49 @@
+using Note.Attributes;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
-using Note.Attributes;
-using System.Diagnostics.Contracts;
-using System.Collections.Generic;
 
-namespace Note
+namespace Note.Enumberables
 {
     [Author("Manu Puduvalli")]
     [Author("Sam Yuen")]
     public static class EnumerableUtils
     {
+        /// <summary>
+        /// Adds all the values in an IEnumerable.
+        /// </summary>
+        /// <param name="src">the IEnumerable of type double</param>
+        /// <exception cref="ArgumentNullException">Thrown when the source is null</exception>
+        /// <returns>The sum of all elements in the source</returns>
+        [Beta]
+        public static int AddAll(this IEnumerable<int> src)
+        {
+            src = src ?? throw new ArgumentNullException(nameof(src));
+            Contract.EndContractBlock();
+
+            if (src.Count() == 1)
+            {
+                return src.ElementAt(0);
+            }
+            var arr_mult_tot = src.Aggregate(1, (idx1, idx2) => idx1 + idx2);
+            return arr_mult_tot;
+        }
+
+        /// <summary>
+        /// A generic overload of the <see cref="AddAll(IEnumerable{int})"/> method. This method will call
+        /// the <see cref="AddAll(IEnumerable{int})"/> overload.
+        /// </summary>
+        /// <typeparam name="T">The type of the enumerable</typeparam>
+        /// <param name="numbers">The specified enumerable</param>
+        /// <param name="selector">The numeral specifier</param>
+        /// <returns>The sum of all elements in the source</returns>
+        public static int AddAll<T>(this IEnumerable<T> numbers, Func<T, int> selector)
+        {
+            return (from num in numbers select selector(num)).AddAll();
+        }
+
         /// <summary>
         /// Concatenates all enumerables which are specified in in the parameter. The
         /// concatenation occurs in the order specified in the parameter.
@@ -38,99 +71,24 @@ namespace Note
         /// </code>
         public static IEnumerable<T> ConcatAny<T>(params IEnumerable<T>[] ie) //Passing a variable number of IEnumerable's as params
         {
-            if (ie.Any(x => x == null)) throw new ArgumentNullException("One of the params array's were null");
+            if (ie.Any(x => x is null)) throw new ArgumentNullException("One of the params array's were null");
             Contract.EndContractBlock();
 
             var arrTotal = 0;
-            foreach (IEnumerable<T> t in ie)
+            foreach (var t in ie)
             {
                 arrTotal += t.Count();
             }
             var z = new T[arrTotal];
 
             var dest = 0;
-            foreach (IEnumerable<T> t in ie)
+            foreach (var t in ie)
             {
                 Array.ConstrainedCopy(t.ToArray(), 0, z, dest, t.Count());
                 dest += t.Count();
             }
             return z;
         }
-
-        /// <summary>
-        /// Adds all the values in an IEnumerable.
-        /// </summary>
-        /// <param name="src">the IEnumerable of type double</param>
-        /// <exception cref="ArgumentNullException">Thrown when the source is null</exception>
-        /// <returns>The sum of all elements in the source</returns>
-        [Beta]
-        public static int AddAll(this IEnumerable<int> src)
-        {
-            if (src == null) throw new ArgumentNullException(nameof(src));
-            Contract.EndContractBlock();
-
-            if (src.Count() == 1)
-            {
-                return src.ElementAt(0);
-            }
-            var arr_mult_tot = src.Aggregate(1, (idx1, idx2) => idx1 + idx2);
-            return arr_mult_tot;
-        }
-
-        /// <summary>
-        /// A generic overload of the <see cref="AddAll(IEnumerable{int})"/> method. This method will call
-        /// the <see cref="AddAll(IEnumerable{int})"/> overload.
-        /// </summary>
-        /// <typeparam name="T">The type of the enumerable</typeparam>
-        /// <param name="numbers">The specified enumerable</param>
-        /// <param name="selector">The numeral specifier</param>
-        /// <returns>The sum of all elements in the source</returns>
-        public static int AddAll<T>(this IEnumerable<T> numbers, Func<T, int> selector)
-        {
-            return (from num in numbers select selector(num)).AddAll();
-        }
-
-        /// <summary>
-        /// Subtracts all the values in an IEnumerable.
-        /// </summary>
-        /// <param name="src">the IEnumerable of type double</param>
-        /// <exception cref="ArgumentNullException">Thrown when the source is null</exception>
-        /// <returns>The difference of all elements in the source</returns>
-        [Beta]
-        public static int SubtractAll(this IEnumerable<int> src)
-        {
-            if (src == null) throw new ArgumentNullException(nameof(src));
-            Contract.EndContractBlock();
-
-            if (src.Count() == 1)
-            {
-                return src.ElementAt(0);
-            }
-            var arr_mult_tot = src.Aggregate(0, (idx1, idx2) => idx1 - idx2);
-            return arr_mult_tot;
-        }
-
-        /// <summary>
-        /// A generic overload of the <see cref="SubtractAll(IEnumerable{int})"/> method. This method will call
-        /// the <see cref="SubtractAll(IEnumerable{int})"/> overload.
-        /// </summary>
-        /// <typeparam name="T">The type of the enumerable</typeparam>
-        /// <param name="numbers">The specified enumerable</param>
-        /// <param name="selector">The numeral specifier</param>
-        /// <returns>The difference of all elements in the source</returns>
-        public static int SubtractAll<T>(this IEnumerable<T> numbers, Func<T, int> selector)
-        {
-            return (from num in numbers select selector(num)).SubtractAll();
-        }
-
-        /// <summary>
-        /// Returns whether an IEnumerable is null or empty
-        /// </summary>
-        /// <typeparam name="T">The type of the IEnumerable</typeparam>
-        /// <param name="ie">The IEnumerable to be used</param>
-        /// <returns>The truth</returns>
-        public static bool IsNullOrEmpty<T>(IEnumerable<T> ie) => ie == null || ie.Count() == 0;
-
         /// <summary>
         /// Inserts the specified element at the specified index in the enumerable (modifying the original enumerable).
         /// If element at that position exits, If shifts that element and any subsequent elements to the right,
@@ -171,7 +129,7 @@ namespace Note
         {
             int len = src.Count();
 
-            if (src == null || valuesToIns == null)
+            if (src is null || valuesToIns is null)
             {
                 throw new ArgumentNullException();
             }
@@ -206,6 +164,98 @@ namespace Note
         }
 
         /// <summary>
+        /// Returns whether an IEnumerable is null or empty
+        /// </summary>
+        /// <typeparam name="T">The type of the IEnumerable</typeparam>
+        /// <param name="ie">The IEnumerable to be used</param>
+        /// <returns>The truth</returns>
+        public static bool IsNullOrEmpty<T>(IEnumerable<T> ie) => ie is null || ie.Count() == 0;
+
+        /// <summary>
+        /// Enables python style for-loop for easier readability. This loop begins
+        /// at the starting value and loops until the end - 1,
+        /// </summary>
+        /// <param name="start">The starting counter for the loop (inclusive)</param>
+        /// <param name="end">The ending counter for the loop (exclusive)</param>
+        /// <returns>An IEnumerable<int> representing the current index</returns>
+        /// <example>This example shows how to use the <see cref="Range(int, int)"/>method.</example>
+        /// <code>
+        /// using static Utilities.EnumerableUtils;
+        ///
+        /// class TestClass
+        /// {
+        ///     static void Main(string[] args)
+        ///     {
+        ///         foreach(int i in Range(0,10)) Console.WriteLine(i); //Prints 0 - 9
+        ///     }
+        /// }
+        /// </code>
+        public static IEnumerable<int> Range(int start, int end)
+        {
+            for (int i = start; i < end; i++)
+                yield return i;
+            yield break;
+        }
+
+        /// <summary>
+        /// Enables python style for-loop for easier readability. This loop begins
+        /// at the starting value and loops until the end.
+        /// </summary>
+        /// <param name="start">The starting counter for the loop (inclusive)</param>
+        /// <param name="end">The ending counter for the loop (inclusive)</param>
+        /// <returns>An IEnumerable<int> representing the current index</returns>
+        /// <example>This example shows how to use the <see cref="Span(int, int)"/>method.</example>
+        /// <code>
+        /// using static Utilities.EnumerableUtils;
+        ///
+        /// class TestClass
+        /// {
+        ///     static void Main(string[] args)
+        ///     {
+        ///         foreach(int i in Span(0,10)) Console.WriteLine(i); //Prints 0 - 10
+        ///     }
+        /// }
+        /// </code>
+        public static IEnumerable<int> Span(int start, int end)
+        {
+            for (int i = start; i <= end; i++)
+                yield return i;
+            yield break;
+        }
+
+        /// <summary>
+        /// Subtracts all the values in an IEnumerable.
+        /// </summary>
+        /// <param name="src">the IEnumerable of type double</param>
+        /// <exception cref="ArgumentNullException">Thrown when the source is null</exception>
+        /// <returns>The difference of all elements in the source</returns>
+        [Beta]
+        public static int SubtractAll(this IEnumerable<int> src)
+        {
+            src = src ?? throw new ArgumentNullException(nameof(src));
+            Contract.EndContractBlock();
+
+            if (src.Count() == 1)
+            {
+                return src.ElementAt(0);
+            }
+            var arr_mult_tot = src.Aggregate(0, (idx1, idx2) => idx1 - idx2);
+            return arr_mult_tot;
+        }
+
+        /// <summary>
+        /// A generic overload of the <see cref="SubtractAll(IEnumerable{int})"/> method. This method will call
+        /// the <see cref="SubtractAll(IEnumerable{int})"/> overload.
+        /// </summary>
+        /// <typeparam name="T">The type of the enumerable</typeparam>
+        /// <param name="numbers">The specified enumerable</param>
+        /// <param name="selector">The numeral specifier</param>
+        /// <returns>The difference of all elements in the source</returns>
+        public static int SubtractAll<T>(this IEnumerable<T> numbers, Func<T, int> selector)
+        {
+            return (from num in numbers select selector(num)).SubtractAll();
+        }
+        /// <summary>
         /// Prints a string representation of an enumerable. There are 4 supported lengths for the formattingRegex. The
         /// default length is 0 and the default behavior depends on the type of the enumerable. If the type is primitive
         /// (based on the System.IsPrimitive property) including decimal and string, then it prints the enumerable with a space
@@ -227,9 +277,9 @@ namespace Note
         /// <exception cref="FormatException">If the formatting regex length is neither 0 or 3</exception>
         /// <example>This sample shows how to call the <see cref="ToStringX{T}(T[], string, bool)"/> method.</example>
         /// <code>
-        /// 
+        ///
         /// using static Utilities.EnumerableUtils;
-        /// 
+        ///
         /// class TestClass
         /// {
         ///     static void Main(string[] args)
@@ -252,7 +302,7 @@ namespace Note
         {
             int frl = formattingRegex.Length;
 
-            if (src == null) throw new ArgumentNullException(nameof(src));
+            src = src ?? throw new ArgumentNullException(nameof(src));
 
             if (frl < 0 || frl > 3)
             {
@@ -263,7 +313,7 @@ namespace Note
             Contract.EndContractBlock();
 
             string outerLeft = string.Empty, separator = string.Empty, outerRight = string.Empty;
-            bool hasNoSep = false;
+            var hasNoSep = false;
             if (formattingRegex.Equals("/0+"))
             {
                 hasNoSep = true;
@@ -288,7 +338,7 @@ namespace Note
                     break;
             }
 
-            bool isLooselyPrimitive = false;
+            var isLooselyPrimitive = false;
             var T_type = typeof(T);
             if (T_type.IsPrimitive || T_type == typeof(decimal) || T_type == typeof(string))
             {
@@ -344,58 +394,6 @@ namespace Note
             }
             sb.Append(outerRight);
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// Enables python style for-loop for easier readability. This loop begins
-        /// at the starting value and loops until the end - 1,
-        /// </summary>
-        /// <param name="start">The starting counter for the loop (inclusive)</param>
-        /// <param name="end">The ending counter for the loop (exclusive)</param>
-        /// <returns>An IEnumerable<int> representing the current index</returns>
-        /// <example>This example shows how to use the <see cref="Range(int, int)"/>method.</example>
-        /// <code>
-        /// using static Utilities.EnumerableUtils;
-        /// 
-        /// class TestClass
-        /// {
-        ///     static void Main(string[] args)
-        ///     {
-        ///         foreach(int i in Range(0,10)) Console.WriteLine(i); //Prints 0 - 9
-        ///     }
-        /// }
-        /// </code>
-        public static IEnumerable<int> Range(int start, int end)
-        {
-            for (int i = start; i < end; i++) 
-                yield return i; 
-            yield break;
-        }
-
-        /// <summary>
-        /// Enables python style for-loop for easier readability. This loop begins
-        /// at the starting value and loops until the end.
-        /// </summary>
-        /// <param name="start">The starting counter for the loop (inclusive)</param>
-        /// <param name="end">The ending counter for the loop (inclusive)</param>
-        /// <returns>An IEnumerable<int> representing the current index</returns>
-        /// <example>This example shows how to use the <see cref="Span(int, int)"/>method.</example>
-        /// <code>
-        /// using static Utilities.EnumerableUtils;
-        /// 
-        /// class TestClass
-        /// {
-        ///     static void Main(string[] args)
-        ///     {
-        ///         foreach(int i in Span(0,10)) Console.WriteLine(i); //Prints 0 - 10
-        ///     }
-        /// }
-        /// </code>
-        public static IEnumerable<int> Span(int start, int end)
-        {
-            for (int i = start; i <= end; i++) 
-                yield return i; 
-            yield break;
         }
     }//EnumerableUtils
 }//Namespace

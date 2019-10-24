@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Note.MathUtils.Algebra
+namespace Note.MathUtils
 {
     class Algebra
     {

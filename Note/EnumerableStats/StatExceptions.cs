@@ -1,6 +1,6 @@
 ﻿using System;
 using Note.Attributes;
-namespace Note.UtilExceptions
+namespace Note.UtilExceptions.EnumberableStatsExceptions
 {
     [Author("Manu Puduvalli")]
     [Serializable()]

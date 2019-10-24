@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Note.UtilExceptions;
+using Note.UtilExceptions.EnumberableStatsExceptions;
 using Note.Attributes;
 using System.Diagnostics.Contracts;
 
-namespace Note
+namespace Note.Enumberables
 {
     [Author("Sam Yuen")]
     [Author("Manu Puduvalli")]
@@ -14,7 +14,7 @@ namespace Note
         /*
          * The tolerance level (upper and lower limits)
          */
-        internal const double TOLERANCE = 0.00000000000000000000000;
+        private const double TOLERANCE = 0.00000000000000000000;
 
         /// <summary>
         /// Finds the average of all the elements in the enumerable.
@@ -25,8 +25,12 @@ namespace Note
         /// <returns>The average of all the elements in the source</returns>
         private static double Mean(this IEnumerable<double> src)
         {
-            if (src == null) throw new ArgumentNullException(nameof(src));
-            if (src.Count() == 0) throw new InvalidOperationException(nameof(src));
+            src = src ?? throw new ArgumentNullException(nameof(src));
+            if (src.Count() == 0)
+            {
+                throw new InvalidOperationException(nameof(src));
+            }
+
             Contract.EndContractBlock();
 
             if (src.Count() == 1)
@@ -60,7 +64,7 @@ namespace Note
         {
             int len = src.Count();
 
-            if (src == null) throw new ArgumentNullException(nameof(src));
+            src = src ?? throw new ArgumentNullException(nameof(src));
             if (len == 0) throw new InvalidOperationException(nameof(src));
             Contract.EndContractBlock();
             if (len == 1)
@@ -102,7 +106,7 @@ namespace Note
         {
             int len = src.Count();
 
-            if (src == null) throw new ArgumentNullException(nameof(src));
+            src = src ?? throw new ArgumentNullException(nameof(src));
             if (len == 0) throw new InvalidOperationException(nameof(src));
 
             Contract.EndContractBlock();
@@ -166,7 +170,7 @@ namespace Note
         {
             int len = src.Count();
 
-            if (src == null) throw new ArgumentNullException(nameof(src));
+            src = src ?? throw new ArgumentNullException(nameof(src));
             if (len == 0) throw new InvalidOperationException(nameof(src));
             Contract.EndContractBlock();
 
@@ -205,7 +209,7 @@ namespace Note
         {
             int len = src.Count();
 
-            if (src == null) throw new ArgumentNullException(nameof(src));
+            src = src ?? throw new ArgumentNullException(nameof(src));
             if (len == 0) throw new InvalidOperationException(nameof(src));
             Contract.EndContractBlock();
 
@@ -242,8 +246,7 @@ namespace Note
         /// <returns>The sample standard deviation of the source</returns>
         public static double SampleStandardDeviation(this IEnumerable<double> src)
         {
-
-            if (src == null) throw new ArgumentNullException(nameof(src));
+            src = src ?? throw new ArgumentNullException(nameof(src));
             if (src.Count() == 0) throw new InvalidOperationException(nameof(src));
             Contract.EndContractBlock();
 
@@ -273,7 +276,7 @@ namespace Note
         /// <returns>The population standard deviation of the source</returns>
         public static double PopulationStandardDeviation(this IEnumerable<double> src)
         {
-            if (src == null) throw new ArgumentNullException(nameof(src));
+            src = src ?? throw new ArgumentNullException(nameof(src));
             if (src.Count() == 0) throw new InvalidOperationException(nameof(src));
             Contract.EndContractBlock();
 
@@ -305,7 +308,7 @@ namespace Note
         {
             int len = src.Count();
 
-            if (src == null) throw new ArgumentNullException(nameof(src));
+            src = src ?? throw new ArgumentNullException(nameof(src));
             if (len == 0) throw new InvalidOperationException(nameof(src));
             Contract.EndContractBlock();
 
@@ -344,7 +347,7 @@ namespace Note
         {
             int len = src.Count();
 
-            if (src == null) throw new ArgumentNullException(nameof(src));
+            src = src ?? throw new ArgumentNullException(nameof(src));
             switch (len)
             {
                 case 1:
@@ -384,7 +387,7 @@ namespace Note
         {
             int len = src.Count();
 
-            if (src == null) throw new ArgumentNullException(nameof(src));
+            src = src ?? throw new ArgumentNullException(nameof(src));
             switch (len)
             {
                 case 1:
@@ -421,7 +424,7 @@ namespace Note
         public static double InterQuartileRange(this IEnumerable<double> src)
         {
 
-            if (src == null) throw new ArgumentNullException(nameof(src));
+            src = src ?? throw new ArgumentNullException(nameof(src));
             if (src.Count() == 0) throw new InvalidOperationException(nameof(src));
             Contract.EndContractBlock();
 
@@ -454,7 +457,7 @@ namespace Note
         public static bool IsNormalProportion(this IEnumerable<double> src, double samstat)
         {
             int len = src.Count();
-            if (src == null) throw new ArgumentNullException(nameof(src));
+            _ = src ?? throw new ArgumentNullException(nameof(src));
             if (len == 0) throw new InvalidOperationException(nameof(src));
             Contract.EndContractBlock();
 
@@ -485,7 +488,7 @@ namespace Note
         /// <returns>Returns whether if the data set is normally distributed for a mean.</returns>
         public static bool IsNormalMean(this IEnumerable<double> src)
         {
-            if (src == null) throw new ArgumentNullException(nameof(src));
+            src = src ?? throw new ArgumentNullException(nameof(src));
             if (src.Count() == 0) throw new InvalidOperationException(nameof(src));
             Contract.EndContractBlock();
 
@@ -515,7 +518,7 @@ namespace Note
         /// <returns>The standardized score of the source</returns>
         public static double StandardizedScore(this IEnumerable<double> src, double elem)
         {
-            if (src == null) throw new ArgumentNullException(nameof(src));
+            src = src ?? throw new ArgumentNullException(nameof(src));
             if (src.Count() == 0) throw new InvalidOperationException(nameof(src));
             Contract.EndContractBlock();
 
