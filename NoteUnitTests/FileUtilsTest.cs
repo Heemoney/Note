@@ -1,5 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using static Note.FileUtils;
+using static Note.File.FileUtils;
 
 //USE THIS NAMESPACE FOR TESTING METHODS
 namespace NoteUnitTests

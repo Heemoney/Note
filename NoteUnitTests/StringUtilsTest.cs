@@ -18,8 +18,8 @@ namespace NoteUnitTests
                 ['('] = ')'
             };
 
-            Assert.AreEqual(true, StringUtils.IsWellFormed("<<((Manu))>>", dt));
-            Assert.AreEqual(false, StringUtils.IsWellFormed("<<((Manu)>>", dt));
+            Assert.AreEqual(true, Note.Strings.StringUtils.IsWellFormed("<<((Manu))>>", dt));
+            Assert.AreEqual(false, Note.Strings.StringUtils.IsWellFormed("<<((Manu)>>", dt));
         }
 
         [TestMethod]
