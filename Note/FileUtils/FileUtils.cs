@@ -1,4 +1,5 @@
 ﻿using Note.Attributes;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -57,6 +58,7 @@ namespace Note.File
         /// </summary>
         /// <param name="filename">The file to be used</param>
         /// <returns>An <see cref="IEnumerable{string}"/> where each index is a line of the file</returns>
+        [Beta]
         public static IEnumerable<string> ReadFileByLine(this string filename)
         {
             string line;

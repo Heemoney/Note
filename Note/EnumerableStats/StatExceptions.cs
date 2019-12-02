@@ -3,6 +3,7 @@ using Note.Attributes;
 namespace Note.UtilExceptions.EnumberableStatsExceptions
 {
     [Author("Manu Puduvalli")]
+    [Author("Sam Yuen")]
     [Serializable()]
     public class InsufficientDataSetException : Exception
     {
@@ -15,6 +16,7 @@ namespace Note.UtilExceptions.EnumberableStatsExceptions
     }
 
     [Author("Manu Puduvalli")]
+    [Author("Sam Yuen")]
     [Serializable()]
     public class NoModeException : Exception
     {

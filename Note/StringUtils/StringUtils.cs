@@ -1,4 +1,5 @@
 ﻿using Note.Attributes;
+using Note.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -115,7 +116,7 @@ namespace Note.Strings
             str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
-            if (ZeroOrOne(str))
+            if (IsZeroOrOne(str))
             {
                 return false;
             }
@@ -141,7 +142,7 @@ namespace Note.Strings
             str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
-            if (ZeroOrOne(str))
+            if (IsZeroOrOne(str))
             {
                 return false;
             }
@@ -210,7 +211,7 @@ namespace Note.Strings
             str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
-            if (ZeroOrOne(str))
+            if (IsZeroOrOne(str))
             {
                 return true;
             }
@@ -243,7 +244,7 @@ namespace Note.Strings
             str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
-            if (ZeroOrOne(str))
+            if (IsZeroOrOne(str))
             {
                 return false;
             }
@@ -272,7 +273,7 @@ namespace Note.Strings
             str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
-            if (ZeroOrOne(str))
+            if (IsZeroOrOne(str))
             {
                 return false;
             }
@@ -354,7 +355,7 @@ namespace Note.Strings
         {
             str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
-            return ZeroOrOne(str) ? false : IsWellFormed(str, WellFormedUtility.DefaultAlphabet);
+            return IsZeroOrOne(str) ? false : IsWellFormed(str, WellFormedUtility.DefaultAlphabet);
         }
 
         /// <summary>
@@ -398,7 +399,7 @@ namespace Note.Strings
             str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
-            if (ZeroOrOne(str))
+            if (IsZeroOrOne(str))
             {
                 return false;
             }
@@ -579,7 +580,7 @@ namespace Note.Strings
             str = str ?? throw new ArgumentNullException(nameof(str));
             Contract.EndContractBlock();
 
-            if (ZeroOrOne(str))
+            if (str.IsZeroOrOne())
             {
                 return str;
             }
@@ -602,9 +603,7 @@ namespace Note.Strings
         public static string Shuffle(this string str, bool preserveSpaces = false)
         {
             str = str ?? throw new ArgumentNullException(nameof(str));
-            Contract.EndContractBlock();
-
-            if (ZeroOrOne(str))
+            if (str.IsZeroOrOne())
             {
                 return str;
             }
@@ -617,15 +616,16 @@ namespace Note.Strings
 
                     for (var i = 0; i < spaceSplit.Length; i++)
                     {
-                        if (!ZeroOrOne(spaceSplit[i]))
+                        if (!spaceSplit[i].IsZeroOrOne())
                         {
-                            spaceSplit[i] = new ShuffleUtility(spaceSplit[i]).ShuffleThis();
+                            var shuffleUtil = new CommonUtils.ShuffleUtil<char>(spaceSplit[i].ToCharArray());
+                            spaceSplit[i] = new string(shuffleUtil.ShuffleThis());
                         }
                     }
                     return string.Join(" ", spaceSplit);
                 }
             }
-            return new ShuffleUtility(str).ShuffleThis();
+            return new string(new CommonUtils.ShuffleUtil<char>(str.ToCharArray()).ShuffleThis());
         }
 
         /// <summary>
@@ -649,184 +649,9 @@ namespace Note.Strings
         /// <param name="str">The string to be used</param>
         /// <returns>True if the length of the string is zero or one</returns>
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        internal static bool ZeroOrOne(string str) => str.Length == 0 || str.Length == 1;
+        internal static bool IsZeroOrOne(this string str) => str.Length == 0 || str.Length == 1;
 
-        /// <summary>
-        /// A utility class to shuffle a string.
-        /// </summary>
-        [Author("Manu Puduvalli")]
-        private protected class ShuffleUtility
-        {
-            private readonly StringBuilder sb;
-            private readonly string str;
-
-            /// <summary>
-            /// Creates an instance of the ShuffleUtility and instantiates
-            /// any fields.
-            /// </summary>
-            /// <param name="str">The string to be shuffled</param>
-            public ShuffleUtility(string str)
-            {
-                //Null Check because constructor is public and class is private protected
-                this.str = str ?? throw new ArgumentNullException(nameof(str));
-                sb = new StringBuilder(str);
-            }
-
-            /// <summary>
-            /// Conducts the shuffle. The methodology of the shuffle is simple while
-            /// being less biased than System.Random. For each character that exists
-            /// in the string, a swap occurs two times. Four characters are randomly
-            /// chosen from the string and their indeces are stored. The index values
-            /// occur from the range of [0, length). In addition, two randomly chosen
-            /// numbers are created in order to decide which two indeces are swapped
-            /// first.
-            ///
-            /// The following is a visual example of the shuffling algorithm described
-            /// in the summary:
-            /// -- Note: In the loop below, the values in this example are chosen
-            ///    arbitrarily and will not necessarily be the same values on each
-            ///    iteration.
-            ///
-            /// -- Assume the string -> "Thiscanbeareallylongstring"
-            ///
-            /// -- loop begins:
-            ///
-            /// -- Four indeces (w, x, y, z) are chosen at random: [3, 10, 7, 20]
-            ///
-            /// -- Two more random values (a, b) are chosen in the range of [1,4]
-            ///    where each value represents one of the four index values.
-            ///
-            /// -- Given every possible combination of [1,4] with combination size 's'
-            ///    where 's' equals 2, the random values 'a' and 'b' match a possible
-            ///    combination and perform two swaps.
-            ///
-            ///         -- If value 'a' is 2 and value 'b' is 4 (or vice versa), then
-            ///            indeces 'x' and 'z' are swapped first, subsequently followed
-            ///            by the swap of indeces 'w' and 'y'.
-            ///
-            ///         -- In the event that value 'a' and 'b' are the same value,
-            ///            the same random values used for generating 'a' and b'
-            ///            are reused in order to generate 2 values (d, e) in the
-            ///            range, [1, 2]. The value 'd' decides whether 'a' or 'b'
-            ///            will be changed value. For example, if 'd' evaluates
-            ///            to 1, then value 'a' is guaranteed to change. If 'd'
-            ///            evaluates to 2, however, then value 'b' is guaranteed change.
-            ///            Value 'e' decides whether to increment or decrement the number
-            ///            in order to break the the tie between values 'a' and 'b'.
-            ///            If 'e' is 1, either 'a' or 'b' is decremented. If 'e' is 2,
-            ///            either 'a' or 'b is incremented. Special consideration is taken
-            ///            for the edge cases (if 'a' or 'b' holds the value 1 or 4).
-            ///
-            /// -- The current state of the string is -> "Thibcanseaseallylongrtring
-            ///
-            /// -- Loop 'n' times where 'n' is the size of the string
-            ///
-            /// -- For each letter in the string, a maximum of four character swaps may occur.
-            ///    If swapping values are the same, then a swap does not occur.
-            /// </summary>
-            /// <returns>The shuffled string</returns>
-            public string ShuffleThis()
-            {
-                using (var rngcsp = new System.Security.Cryptography.RNGCryptoServiceProvider())
-                {
-                    var len = str.Length;
-
-                    for (var i = 0; i < len; i++)
-                    {
-                        var _1 = new byte[8];
-                        var _2 = new byte[8];
-                        var _3 = new byte[8];
-                        var _4 = new byte[8];
-
-                        rngcsp.GetBytes(_1);
-                        rngcsp.GetBytes(_2);
-                        rngcsp.GetBytes(_3);
-                        rngcsp.GetBytes(_4);
-
-                        var one = (int)(Math.Abs(BitConverter.ToInt64(_1, 0)) % (len - 1) + 1);
-                        var two = (int)(Math.Abs(BitConverter.ToInt64(_2, 0)) % (len - 1) + 1);
-                        var three = (int)(Math.Abs(BitConverter.ToInt64(_3, 0)) % (len - 1) + 1);
-                        var four = (int)(Math.Abs(BitConverter.ToInt64(_4, 0)) % (len - 1) + 1);
-
-                        var indexOne = new byte[8];
-                        rngcsp.GetBytes(data: indexOne);
-                        long longIndexOne = Math.Abs(BitConverter.ToInt64(indexOne, startIndex: 0));
-
-                        var indexTwo = new byte[8];
-                        rngcsp.GetBytes(data: indexTwo);
-                        long longIndexTwo = Math.Abs(BitConverter.ToInt64(indexTwo, startIndex: 0));
-
-                        var randOne = (int)(longIndexOne % 4 + 1);
-                        var randTwo = (int)(longIndexTwo % 4 + 1);
-
-                        if (randOne == randTwo)
-                        {
-                            var chooser = (int)(longIndexOne % 2 + 1);
-                            var changer = (int)(longIndexTwo % 2 + 1);
-
-                            if (chooser == 1)
-                            {
-                                if (randOne == 1) randOne++;
-                                else if (randOne == 4) randOne--;
-                                else randOne = changer == 1 ? randOne - 1 : randOne + 1;
-                            }
-                            else // 2
-                            {
-                                if (randTwo == 1) randTwo++;
-                                else if (randTwo == 4) randTwo--;
-                                else randTwo = changer == 1 ? randTwo - 1 : randTwo + 1;
-                            }
-                        }
-                        //All combinations of [1-4]
-                        if ((randOne == 1 && randTwo == 2) || (randOne == 2 && randTwo == 1))
-                        {
-                            ShuffleSwapper(sb, one, two, three, four);
-                        }
-                        else if ((randOne == 1 && randTwo == 3) || (randOne == 3 && randTwo == 1))
-                        {
-                            ShuffleSwapper(sb, one, three, three, four);
-                        }
-                        else if ((randOne == 1 && randTwo == 4) || (randOne == 4 && randTwo == 1))
-                        {
-                            ShuffleSwapper(sb, one, four, two, three);
-                        }
-                        else if ((randOne == 2 && randTwo == 3) || (randOne == 3 && randTwo == 2))
-                        {
-                            ShuffleSwapper(sb, two, three, one, four);
-                        }
-                        else if ((randOne == 2 && randTwo == 4) || (randOne == 4 && randTwo == 2))
-                        {
-                            ShuffleSwapper(sb, two, four, one, three);
-                        }
-                        else
-                        {
-                            ShuffleSwapper(sb, three, four, one, two);
-                        }
-                    }
-                }
-                return sb.ToString();
-            }
-
-            private void ShuffleSwapper(StringBuilder sb, int indexOne, int indexTwo, int indexThree, int indexFour)
-            {
-                //Contract.Requires<ArgumentNullException>(sb != null);
-                //Contract.Requires((indexOne >= 0) && (indexTwo >= 0) && (indexThree >= 0) && (indexFour >= 0));
-                Contract.EndContractBlock();
-
-                if (indexOne != indexTwo)
-                {
-                    char tmp = sb[indexOne];
-                    sb[indexOne] = sb[indexTwo];
-                    sb[indexTwo] = tmp;
-                }
-                if (indexThree != indexFour)
-                {
-                    char tmp2 = sb[indexThree];
-                    sb[indexThree] = sb[indexFour];
-                    sb[indexFour] = tmp2;
-                }
-            }
-        }
+        
         /// <summary>
         /// A utility class that contains functions to determine
         /// whether a string is a well formed string.

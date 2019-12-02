@@ -169,7 +169,16 @@ namespace Note.Enumberables
         /// <typeparam name="T">The type of the IEnumerable</typeparam>
         /// <param name="ie">The IEnumerable to be used</param>
         /// <returns>The truth</returns>
-        public static bool IsNullOrEmpty<T>(IEnumerable<T> ie) => ie is null || ie.Count() == 0;
+        public static bool IsNullOrEmpty<T>(this IEnumerable<T> ie) => ie is null || ie.Count() == 0;
+
+        /// <summary>
+        /// Returns true if the Count of the IEnumerable is zero or one.
+        /// </summary>
+        /// <typeparam name="T">The type of the IEnumerable</typeparam>
+        /// <param name="ie">The IEnumerable to be used</param>
+        /// <returns>True if the Count of the IEnumberable is zero or one</returns>
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        internal static bool IsZeroOrOne<T>(this IEnumerable<T> ie) => ie.Count() == 0 || ie.Count() == 1;
 
         /// <summary>
         /// Enables python style for-loop for easier readability. This loop begins
@@ -195,6 +204,22 @@ namespace Note.Enumberables
             for (int i = start; i < end; i++)
                 yield return i;
             yield break;
+        }
+
+        /// <summary>
+        /// Crpytographically shuffles an enumerable. 
+        /// </summary>
+        /// <typeparam name="T">The element type of the IEnumerable</typeparam>
+        /// <param name="src">The IEnumerable</param>
+        /// <returns>The Shuffled IEnumerable</returns>
+        public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> src)
+        {
+            src = src ?? throw new ArgumentNullException(nameof(src));
+            if (src.IsZeroOrOne())
+            {
+                return src;
+            }
+            return new Common.CommonUtils.ShuffleUtil<T>(src.ToArray()).ShuffleThis();
         }
 
         /// <summary>
