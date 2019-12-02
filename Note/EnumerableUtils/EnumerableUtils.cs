@@ -129,9 +129,13 @@ namespace Note.Enumberables
         {
             int len = src.Count();
 
-            if (src is null || valuesToIns is null)
+            if (src is null)
             {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(src));
+            }
+            if(valuesToIns is null)
+            {
+                throw new ArgumentNullException(nameof(valuesToIns));
             }
             if (startIdx < 0 || startIdx >= len || amtToIns < 0)
             {
@@ -178,7 +182,7 @@ namespace Note.Enumberables
         /// <param name="ie">The IEnumerable to be used</param>
         /// <returns>True if the Count of the IEnumberable is zero or one</returns>
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        internal static bool IsZeroOrOne<T>(this IEnumerable<T> ie) => ie.Count() == 0 || ie.Count() == 1;
+        internal static bool IsZeroOrOne<T>(this IEnumerable<T> ie) => !ie.Any() || ie.Count() == 1;
 
         /// <summary>
         /// Enables python style for-loop for easier readability. This loop begins
@@ -325,6 +329,7 @@ namespace Note.Enumberables
         /// </code>
         public static string ToStringX<T>(this IEnumerable<T> src, string formattingRegex = "", bool evenlySpacedSeparator = false)
         {
+            formattingRegex = formattingRegex ?? throw new ArgumentNullException(nameof(formattingRegex));
             int frl = formattingRegex.Length;
 
             src = src ?? throw new ArgumentNullException(nameof(src));

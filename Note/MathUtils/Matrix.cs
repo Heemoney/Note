@@ -16,6 +16,7 @@ namespace Note.MathUtils
     [Beta]
     public class Matrix : IMatrixer<double>, Note.Common.Base.IIndexableDouble<int, double>
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1814:Prefer jagged arrays over multidimensional", Justification = "Multidimensional does not waste space")]
         private double[,] Values { get; set; }
 
         /*
@@ -42,6 +43,7 @@ namespace Note.MathUtils
         /// <param name="matrix">A 2D array of doubles</param>
         public Matrix(double[,] matrix)
         {
+            matrix = matrix ?? throw new ArgumentNullException(nameof(matrix));
             Values = matrix;
             Rows = matrix.GetLength(0);
             Cols = matrix.GetLength(1);
@@ -109,6 +111,9 @@ namespace Note.MathUtils
 
         public static Matrix operator *(Matrix one, Matrix two)
         {
+            one = one ?? throw new ArgumentNullException(nameof(one));
+            two = two ?? throw new ArgumentNullException(nameof(two));
+
             Matrix cp = new Matrix(one.Rows, two.Cols);
 
             if(one.Cols != two.Rows)
@@ -132,6 +137,10 @@ namespace Note.MathUtils
 
         public static bool operator ==(Matrix one, Matrix two)
         {
+            if(one is null || two is null)
+            {
+                return false;
+            }
             if (!EqualDimension(one, two))
                 return false;
 
@@ -148,6 +157,10 @@ namespace Note.MathUtils
 
         public static bool operator !=(Matrix one, Matrix two)
         {
+            if (one is null || two is null)
+            {
+                return true;
+            }
             if (!EqualDimension(one, two))
                 return true;
 
@@ -175,6 +188,8 @@ namespace Note.MathUtils
 
         public static bool EqualDimension(Matrix one, Matrix two)
         {
+            one = one ?? throw new ArgumentNullException(nameof(one));
+            two = two ?? throw new ArgumentNullException(nameof(two));
             return one.Rows == two.Rows && one.Cols == two.Cols;
         }
 
@@ -213,5 +228,26 @@ namespace Note.MathUtils
         {
             return GetEnumerator();
         }
+
+        public static Matrix Add(Matrix left, double scalar)
+           => left + scalar;
+
+        public static Matrix Subtract(Matrix left, double scalar)
+            => left + scalar;
+
+        public static Matrix Multiply(Matrix left, double scalar)
+            => left * scalar;
+
+        public static Matrix DotProduct(Matrix left, Matrix right)
+            => left * right;
+
+        public static Matrix Divide(Matrix left, double scalar)
+            => left / scalar;
+
+        public static Matrix Mod(Matrix left, double scalar)
+            => left % scalar;
+
+        public static Matrix Negate(Matrix m)
+            => !m;
     }
 }

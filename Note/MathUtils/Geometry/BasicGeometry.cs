@@ -39,13 +39,13 @@ namespace Note.MathUtils
             return side1 + side2 + base1 + base2;
         }
 
-        public static double TriangleArea(this double height, double _base)
+        public static double TriangleArea(this double height, double @base)
         {
-            return TrapezoidArea(height, _base, 0);
+            return TrapezoidArea(height, @base, 0);
         }
-        public static double TrianglePerimeter(this double side1, double side2, double _base)
+        public static double TrianglePerimeter(this double side1, double side2, double @base)
         {
-            return TrapezoidPerimeter(side1, side2, _base, 0);
+            return TrapezoidPerimeter(side1, side2, @base, 0);
         }
 
         public static double CircleArea(this double radius)

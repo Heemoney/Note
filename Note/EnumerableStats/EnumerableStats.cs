@@ -26,7 +26,9 @@ namespace Note.Enumberables
         private static double Mean(this IEnumerable<double> src)
         {
             src = src ?? throw new ArgumentNullException(nameof(src));
-            if (src.Count() == 0)
+            int len = src.Count();
+
+            if (len == 0)
             {
                 throw new InvalidOperationException(nameof(src));
             }
@@ -66,6 +68,7 @@ namespace Note.Enumberables
 
             src = src ?? throw new ArgumentNullException(nameof(src));
             if (len == 0) throw new InvalidOperationException(nameof(src));
+
             Contract.EndContractBlock();
             if (len == 1)
             {
@@ -247,7 +250,7 @@ namespace Note.Enumberables
         public static double SampleStandardDeviation(this IEnumerable<double> src)
         {
             src = src ?? throw new ArgumentNullException(nameof(src));
-            if (src.Count() == 0) throw new InvalidOperationException(nameof(src));
+            if (!src.Any()) throw new InvalidOperationException(nameof(src));
             Contract.EndContractBlock();
 
             double variance = SampleVariance(src);
@@ -277,7 +280,7 @@ namespace Note.Enumberables
         public static double PopulationStandardDeviation(this IEnumerable<double> src)
         {
             src = src ?? throw new ArgumentNullException(nameof(src));
-            if (src.Count() == 0) throw new InvalidOperationException(nameof(src));
+            if (!src.Any()) throw new InvalidOperationException(nameof(src));
             Contract.EndContractBlock();
 
             double variance = PopulationVariance(src);
@@ -489,7 +492,7 @@ namespace Note.Enumberables
         public static bool IsNormalMean(this IEnumerable<double> src)
         {
             src = src ?? throw new ArgumentNullException(nameof(src));
-            if (src.Count() == 0) throw new InvalidOperationException(nameof(src));
+            if (!src.Any()) throw new InvalidOperationException(nameof(src));
             Contract.EndContractBlock();
 
             return !(Math.Abs(Mode(src)) > TOLERANCE);
