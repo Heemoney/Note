@@ -30,7 +30,7 @@ namespace Note.Enumberables
 
             if (len == 0)
             {
-                throw new InvalidOperationException(nameof(src));
+                throw new InvalidOperationException(nameof(src), null);
             }
 
             Contract.EndContractBlock();
@@ -428,7 +428,7 @@ namespace Note.Enumberables
         {
 
             src = src ?? throw new ArgumentNullException(nameof(src));
-            if (src.Count() == 0) throw new InvalidOperationException(nameof(src));
+            if (!src.Any()) throw new InvalidOperationException(nameof(src));
             Contract.EndContractBlock();
 
             double lowerQuart = LowerQuartile(src);
@@ -522,7 +522,7 @@ namespace Note.Enumberables
         public static double StandardizedScore(this IEnumerable<double> src, double elem)
         {
             src = src ?? throw new ArgumentNullException(nameof(src));
-            if (src.Count() == 0) throw new InvalidOperationException(nameof(src));
+            if (!src.Any()) throw new InvalidOperationException(nameof(src));
             Contract.EndContractBlock();
 
             return (elem - Mean(src)) / PopulationStandardDeviation(src);

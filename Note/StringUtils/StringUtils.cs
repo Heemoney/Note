@@ -42,7 +42,7 @@ namespace Note.Strings
                 return str;
             }
 
-            int idx = str.IndexOf(string.Empty);
+            int idx = str.IndexOf(string.Empty, StringComparison.InvariantCulture);
             if (idx >= 0)
             {
                 return str.Substring(0, idx);
@@ -218,7 +218,7 @@ namespace Note.Strings
 
             if (ignoreCase)
             {
-                str = str.ToLower();
+                str = str.ToUpperInvariant();
             }
             int j;
             for (var i = 0; i < str.Length; i++)
@@ -251,7 +251,7 @@ namespace Note.Strings
 
             if (ignoreCase)
             {
-                str = str.ToLower();
+                str = str.ToUpperInvariant();
             }
 
             for (var i = 0; i < str.Length - 1; i++)
@@ -280,7 +280,7 @@ namespace Note.Strings
 
             if (ignoreCase)
             {
-                str = str.ToLower();
+                str = str.ToUpperInvariant();
             }
 
             for (var i = 0; i < str.Length - 1; i++)
@@ -307,20 +307,21 @@ namespace Note.Strings
             {
                 return false;
             }
-            return DateTime.TryParseExact(date, formattingRegex, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt);
+
+            return DateTime.TryParseExact(date, formattingRegex, CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
         }
 
         /// <summary>
         /// Checks if a given string is a valid URI. This checks both HTTP and HTTPS URLs.
         /// </summary>
-        /// <param name="URI">The string to be used</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="URI"/> is null</exception>
+        /// <param name="uri">The string to be used</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="uri"/> is null</exception>
         /// <returns>True if the URI is valid</returns>
-        public static bool IsValidURI(string URI)
+        public static bool IsValidURI(string uri)
         {
-            URI = URI ?? throw new ArgumentNullException(nameof(URI));
+            uri = uri ?? throw new ArgumentNullException(nameof(uri));
             Contract.EndContractBlock();
-            return Uri.TryCreate(URI, UriKind.Absolute, out Uri uriResult)
+            return Uri.TryCreate(uri, UriKind.Absolute, out Uri uriResult)
                 && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
         }
 
@@ -433,8 +434,14 @@ namespace Note.Strings
 
             bool CheckContain(string str, int st, int end)
             {
-                foreach (var word in strs)
+                for (var i = 0; i < strs.Count(); i++)
                 {
+                    string word = strs.ElementAt(i);
+                    if (ignoreCase)
+                    {
+                        word = word.ToUpperInvariant();
+                        str = str.ToUpperInvariant();
+                    }
                     for (int j = st; j <= end; j++)
                     {
                         if (word[j] != str[j])
@@ -444,12 +451,9 @@ namespace Note.Strings
                 return true;
             }
 
-            if (strs is null) throw new ArgumentNullException();
+            if (strs is null) throw new ArgumentNullException(nameof(strs));
             Contract.EndContractBlock();
             if (strs.Count() == 1) return strs.ElementAt(0);
-
-            if (ignoreCase)
-                foreach (string s in strs) s.ToLower();
 
             int minLength = FindMin();
             var sb = new StringBuilder();
@@ -480,7 +484,7 @@ namespace Note.Strings
         /// <returns>An ordered enumerable</returns>
         public static IEnumerable<string> OrderByLength(this IEnumerable<string> si)
         {
-            si = si ?? throw new ArgumentException(nameof(si));
+            si = si ?? throw new ArgumentNullException(nameof(si), Properties.Resources.EX_PARAM_NULL);
             return from strs in si orderby strs.Length ascending select strs;
         }
 
@@ -504,7 +508,7 @@ namespace Note.Strings
             }
             if (ignoreCase)
             {
-                str = str.ToLower();
+                str = str.ToUpperInvariant();
             }
             var sb = new StringBuilder(str);
             for (var i = 0; i < args.Length; i++)
@@ -534,7 +538,7 @@ namespace Note.Strings
             }
             if (ignoreCase)
             {
-                str = str.ToLower();
+                str = str.ToUpperInvariant();
             }
             var sb = new StringBuilder(str);
 
@@ -548,7 +552,7 @@ namespace Note.Strings
                 }
                 else
                 {
-                    int idxOfWord = sb.ToString().IndexOf(i_str);
+                    int idxOfWord = sb.ToString().IndexOf(i_str, StringComparison.InvariantCulture);
                     sb.Remove(idxOfWord, cnt);
                 }
             }
@@ -563,7 +567,9 @@ namespace Note.Strings
         /// <param name="index">The index to replace <paramref name="c"/></param>
         public static string ReplaceAt(this string str, int index, char c)
         {
-            str = str ?? throw new ArgumentException(nameof(str));
+            str = str ?? throw new ArgumentNullException(nameof(str), Properties.Resources.EX_PARAM_NULL);
+            Contract.EndContractBlock();
+
             var sb = new StringBuilder(str);
             sb[index] = c;
             return sb.ToString();
@@ -612,7 +618,7 @@ namespace Note.Strings
             {
                 if (str.Contains(C_SP))
                 {
-                    var spaceSplit = str.Split(new char[0], StringSplitOptions.RemoveEmptyEntries);
+                    var spaceSplit = str.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
 
                     for (var i = 0; i < spaceSplit.Length; i++)
                     {
@@ -640,6 +646,7 @@ namespace Note.Strings
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public static string Substring(this string str, int startIndex, int endIndex)
         {
+            str = str ?? throw new ArgumentNullException(nameof(str));
             return str.Substring(startIndex, (endIndex - startIndex) + 1);
         }
 

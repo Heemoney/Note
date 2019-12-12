@@ -11,6 +11,7 @@ namespace Note.Enumberables
     [Author("Sam Yuen")]
     public static class EnumerableUtils
     {
+        private static readonly System.Globalization.CultureInfo CUL_INV = System.Globalization.CultureInfo.InvariantCulture;
         /// <summary>
         /// Adds all the values in an IEnumerable.
         /// </summary>
@@ -71,7 +72,7 @@ namespace Note.Enumberables
         /// </code>
         public static IEnumerable<T> ConcatAny<T>(params IEnumerable<T>[] ie) //Passing a variable number of IEnumerable's as params
         {
-            if (ie.Any(x => x is null)) throw new ArgumentNullException("One of the params array's were null");
+            if (ie.Any(x => x is null)) throw new ArgumentNullException(nameof(ie), "One of the params array's were null");
             Contract.EndContractBlock();
 
             var arrTotal = 0;
@@ -173,7 +174,7 @@ namespace Note.Enumberables
         /// <typeparam name="T">The type of the IEnumerable</typeparam>
         /// <param name="ie">The IEnumerable to be used</param>
         /// <returns>The truth</returns>
-        public static bool IsNullOrEmpty<T>(this IEnumerable<T> ie) => ie is null || ie.Count() == 0;
+        public static bool IsNullOrEmpty<T>(this IEnumerable<T> ie) => ie is null || !ie.Any();
 
         /// <summary>
         /// Returns true if the Count of the IEnumerable is zero or one.
@@ -302,7 +303,7 @@ namespace Note.Enumberables
         /// <param name="formattingRegex">The guidelined regex to be optionally used</param>
         /// <param name="evenlySpacedSeparator">Determines whether the spacing between each element should be the same</param>
         /// <returns>The string representation of the enumerable</returns>
-        /// <exception cref="ArgumentException">If arr is null</exception>
+        /// <exception cref="ArgumentNullException">If arr is null</exception>
         /// <exception cref="FormatException">If the formatting regex length is neither 0 or 3</exception>
         /// <example>This sample shows how to call the <see cref="ToStringX{T}(T[], string, bool)"/> method.</example>
         /// <code>
@@ -344,7 +345,7 @@ namespace Note.Enumberables
 
             string outerLeft = string.Empty, separator = string.Empty, outerRight = string.Empty;
             var hasNoSep = false;
-            if (formattingRegex.Equals("/0+"))
+            if (formattingRegex.Equals("/0+", StringComparison.InvariantCulture))
             {
                 hasNoSep = true;
                 frl = 1;
@@ -353,18 +354,18 @@ namespace Note.Enumberables
             switch (frl)
             {
                 case 3:
-                    outerLeft = formattingRegex[0].ToString();
-                    separator = formattingRegex[1].ToString();
-                    outerRight = formattingRegex[2].ToString();
+                    outerLeft = formattingRegex[0].ToString(CUL_INV);
+                    separator = formattingRegex[1].ToString(CUL_INV);
+                    outerRight = formattingRegex[2].ToString(System.Globalization.CultureInfo.InvariantCulture);
                     break;
 
                 case 2:
-                    outerLeft = formattingRegex[0].ToString();
-                    outerRight = formattingRegex[1].ToString();
+                    outerLeft = formattingRegex[0].ToString(CUL_INV);
+                    outerRight = formattingRegex[1].ToString(CUL_INV);
                     break;
 
                 case 1:
-                    separator = formattingRegex[0].ToString();
+                    separator = formattingRegex[0].ToString(CUL_INV);
                     break;
             }
 
