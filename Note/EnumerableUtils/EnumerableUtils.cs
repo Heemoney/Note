@@ -228,9 +228,9 @@ namespace Note.Enumberables
 
             if(src.GetType() == typeof(Array))
             {
-                return new Common.CommonUtils.ShuffleUtil<T>((T[])src).ShuffleThis();
+                return new Common.ShuffleUtil<T>((T[])src).ShuffleThis();
             }
-            return new Common.CommonUtils.ShuffleUtil<T>(src.ToArray()).ShuffleThis();
+            return new Common.ShuffleUtil<T>(src.ToArray()).ShuffleThis();
         }
 
         /// <summary>

@@ -1,5 +1,4 @@
 ﻿using Note.Attributes;
-using Note.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -624,14 +623,14 @@ namespace Note.Strings
                     {
                         if (!spaceSplit[i].IsZeroOrOne())
                         {
-                            var shuffleUtil = new CommonUtils.ShuffleUtil<char>(spaceSplit[i].ToCharArray());
+                            var shuffleUtil = new Common.ShuffleUtil<char>(spaceSplit[i].ToCharArray());
                             spaceSplit[i] = new string(shuffleUtil.ShuffleThis());
                         }
                     }
                     return string.Join(" ", spaceSplit);
                 }
             }
-            return new string(new CommonUtils.ShuffleUtil<char>(str.ToCharArray()).ShuffleThis());
+            return new string(new Common.ShuffleUtil<char>(str.ToCharArray()).ShuffleThis());
         }
 
         /// <summary>
