@@ -120,7 +120,6 @@
     <Compile Include="Attributes\BetaAttribute.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="MathUtils\IMatrixer.cs" />
-    <Compile Include="MathUtils\Algebra\Algebra.cs" />
     <Compile Include="MathUtils\Geometry\BasicGeometry.cs" />
     <Compile Include="MathUtils\Matrix.cs" />
     <Compile Include="MathUtils\MatrixPropertyException.cs" />
@@ -148,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="bin\" />
+    <Folder Include="MathUtils\Algebra\" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.2.9.8\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />

@@ -174,6 +174,7 @@ namespace Note.Enumberables
         /// <typeparam name="T">The type of the IEnumerable</typeparam>
         /// <param name="ie">The IEnumerable to be used</param>
         /// <returns>The truth</returns>
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> ie) => ie is null || !ie.Any();
 
         /// <summary>
@@ -223,6 +224,11 @@ namespace Note.Enumberables
             if (src.IsZeroOrOne())
             {
                 return src;
+            }
+
+            if(src.GetType() == typeof(Array))
+            {
+                return new Common.CommonUtils.ShuffleUtil<T>((T[])src).ShuffleThis();
             }
             return new Common.CommonUtils.ShuffleUtil<T>(src.ToArray()).ShuffleThis();
         }
@@ -286,25 +292,25 @@ namespace Note.Enumberables
             return (from num in numbers select selector(num)).SubtractAll();
         }
         /// <summary>
-        /// Prints a string representation of an enumerable. There are 4 supported lengths for the formattingRegex. The
+        /// Prints a string representation of an enumerable. There are 4 supported lengths for the fmtExp. The
         /// default length is 0 and the default behavior depends on the type of the enumerable. If the type is primitive
         /// (based on the System.IsPrimitive property) including decimal and string, then it prints the enumerable with a space
         /// as a separator between each element. If the enumerable is not primitive, it prints the enumerable with no separator.
-        /// A formattingRegex of length 1 specifies a character to separate each element. The enumerable is printed out, following
-        /// a default behavior, execpt with the specified separator rather than the default separator. A formattingRegex
-        /// of length 2 specifies a two characters to mark the left and right outer bounds of the enumerable, A formattingRegex
+        /// A fmtExp of length 1 specifies a character to separate each element. The enumerable is printed out, following
+        /// a default behavior, execpt with the specified separator rather than the default separator. A fmtExp
+        /// of length 2 specifies a two characters to mark the left and right outer bounds of the enumerable, A fmtExp
         /// of length 3 specifies a character for the left outer bound of the enumerable, followed by a separator character,
-        /// followed by a character for the right outer bound of the enumerable. If no separator is desired, the "/0+" regex
+        /// followed by a character for the right outer bound of the enumerable. If no separator is desired, the "/0+" expression
         /// can be specified.The evenlySpacedSeparator parameter specifies whether an even number of spaces should be on
         /// both sides of the separator. This parameter ignores Object type enumerable's excluding decimal and string.
         /// </summary>
         /// <typeparam name="T">The type of the enumerable</typeparam>
         /// <param name="src">The IEnumerable to be used</param>
-        /// <param name="formattingRegex">The guidelined regex to be optionally used</param>
+        /// <param name="fmtExp">The guidelined expression to be optionally used</param>
         /// <param name="evenlySpacedSeparator">Determines whether the spacing between each element should be the same</param>
         /// <returns>The string representation of the enumerable</returns>
         /// <exception cref="ArgumentNullException">If arr is null</exception>
-        /// <exception cref="FormatException">If the formatting regex length is neither 0 or 3</exception>
+        /// <exception cref="FormatException">If the formatting expression length is neither 0 or 3</exception>
         /// <example>This sample shows how to call the <see cref="ToStringX{T}(T[], string, bool)"/> method.</example>
         /// <code>
         ///
@@ -328,16 +334,16 @@ namespace Note.Enumberables
         ///     }
         /// }
         /// </code>
-        public static string ToStringX<T>(this IEnumerable<T> src, string formattingRegex = "", bool evenlySpacedSeparator = false)
+        public static string ToStringX<T>(this IEnumerable<T> src, string fmtExp = "", bool evenlySpacedSeparator = false)
         {
-            formattingRegex = formattingRegex ?? throw new ArgumentNullException(nameof(formattingRegex));
-            int frl = formattingRegex.Length;
+            fmtExp = fmtExp ?? throw new ArgumentNullException(nameof(fmtExp));
+            int frl = fmtExp.Length;
 
             src = src ?? throw new ArgumentNullException(nameof(src));
 
             if (frl < 0 || frl > 3)
             {
-                throw new FormatException("Unsupported Regular Expression");
+                throw new FormatException("Unsupported Expression");
             }
 
             Contract.Ensures(Contract.Result<T[]>() != null);
@@ -345,7 +351,7 @@ namespace Note.Enumberables
 
             string outerLeft = string.Empty, separator = string.Empty, outerRight = string.Empty;
             var hasNoSep = false;
-            if (formattingRegex.Equals("/0+", StringComparison.InvariantCulture))
+            if (fmtExp.Equals("/0+", StringComparison.InvariantCulture))
             {
                 hasNoSep = true;
                 frl = 1;
@@ -354,18 +360,18 @@ namespace Note.Enumberables
             switch (frl)
             {
                 case 3:
-                    outerLeft = formattingRegex[0].ToString(CUL_INV);
-                    separator = formattingRegex[1].ToString(CUL_INV);
-                    outerRight = formattingRegex[2].ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    outerLeft = fmtExp[0].ToString(CUL_INV);
+                    separator = fmtExp[1].ToString(CUL_INV);
+                    outerRight = fmtExp[2].ToString(CUL_INV);
                     break;
 
                 case 2:
-                    outerLeft = formattingRegex[0].ToString(CUL_INV);
-                    outerRight = formattingRegex[1].ToString(CUL_INV);
+                    outerLeft = fmtExp[0].ToString(CUL_INV);
+                    outerRight = fmtExp[1].ToString(CUL_INV);
                     break;
 
                 case 1:
-                    separator = formattingRegex[0].ToString(CUL_INV);
+                    separator = fmtExp[0].ToString(CUL_INV);
                     break;
             }
 
