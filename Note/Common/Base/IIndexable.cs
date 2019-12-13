@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Note.Common.Base
+﻿namespace Note.Common.Base
 {
    
     /// <summary>
@@ -26,6 +20,7 @@ namespace Note.Common.Base
     {
         TVal this[TKey key] { get; }
     }
+
     /// <summary>
     /// Specifies an indexer with two dimensions.
     /// </summary>
