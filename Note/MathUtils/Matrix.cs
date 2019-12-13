@@ -51,14 +51,9 @@ namespace Note.MathUtils
 
         public double this[int row, int col]
         {
-            get
-            {
-                return Values[row, col];
-            }
-            set
-            {
-                Values[row, col] = value;
-            }
+            get => Values[row, col];
+  
+            set => Values[row, col] = value;
         }
 
         public Matrix Transpose()

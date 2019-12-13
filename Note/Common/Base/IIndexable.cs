@@ -1,6 +1,5 @@
 ﻿namespace Note.Common.Base
 {
-   
     /// <summary>
     /// Specifies an indexer with one dimension.
     /// </summary>
